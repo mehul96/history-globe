@@ -2,32 +2,57 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Human History 3D Globe</title>
-  <!-- Force HTTPS for libraries -->
+  <title>Human History 3D Globe | Character Edition</title>
   <script src="https://unpkg.com/three"></script>
   <script src="https://unpkg.com/globe.gl"></script>
   <style>
     body { margin: 0; background: #000; font-family: 'Segoe UI', sans-serif; overflow: hidden; color: white; }
     #globeViz { width: 100vw; height: 100vh; }
     
+    /* THE CHARACTER STYLING */
+    .character-container {
+        cursor: pointer;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        transition: transform 0.3s;
+    }
+    .character-container:hover {
+        transform: scale(1.5);
+    }
+    .character-img {
+        width: 50px; /* Adjust size of the figure */
+        height: auto;
+        filter: drop-shadow(0 0 10px rgba(255,255,255,0.5));
+    }
+    .character-label {
+        background: rgba(0, 0, 0, 0.7);
+        color: #ffcc00;
+        padding: 2px 8px;
+        border-radius: 10px;
+        font-size: 10px;
+        margin-top: -5px;
+        border: 1px solid #ffcc00;
+        white-space: nowrap;
+    }
+
     /* THE DIALOGUE BOX */
     #dialogue-box {
       position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
       width: 85%; max-width: 600px; background: white; border-radius: 15px;
       display: none; z-index: 1000; padding: 30px;
-      box-shadow: 0 0 50px rgba(0,0,0,0.8); color: #333;
+      box-shadow: 0 0 100px rgba(0,0,0,0.9); color: #333;
     }
     #box-overlay {
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
       background: rgba(0,0,0,0.8); display: none; z-index: 999;
     }
     .back-btn {
-      background: #E31837; color: white; border: none; padding: 10px 20px;
+      background: #333; color: white; border: none; padding: 10px 20px;
       border-radius: 5px; cursor: pointer; font-weight: bold; margin-bottom: 20px;
     }
-    h2 { margin-top: 0; color: #1a1a1a; border-bottom: 2px solid #f0f0f0; padding-bottom: 10px; }
+    h2 { margin-top: 0; color: #1a1a1a; font-size: 2rem; }
     p { line-height: 1.6; font-size: 1.1rem; }
-    .label { color: #888; font-weight: bold; text-transform: uppercase; font-size: 0.8rem; }
   </style>
 </head>
 <body>
@@ -36,41 +61,72 @@
 
   <div id="box-overlay" onclick="closeBox()"></div>
   <div id="dialogue-box">
-    <button class="back-btn" onclick="closeBox()">← BACK TO GLOBE</button>
-    <div id="content">
-        <p class="label" id="box-year"></p>
-        <h2 id="box-title"></h2>
-        <p id="box-desc"></p>
-    </div>
+    <button class="back-btn" onclick="closeBox()">← BACK TO NAVIGATING EARTH</button>
+    <h2 id="box-title"></h2>
+    <p id="box-year" style="color: #b08d57; font-weight: bold;"></p>
+    <hr>
+    <p id="box-desc"></p>
   </div>
 
   <script>
+    // --- 1. DATASET WITH CHARACTER IMAGES ---
+    // NOTE: Replace the 'img' links with actual PNG cutouts of the people
     const historyData = [
-      { name: "Agricultural Revolution", year: "c. 10,000 BCE", lat: 33, lng: 44, color: "#2ecc71", desc: "The transition from hunting and gathering to settled agriculture." },
-      { name: "Sumerian Civilization", year: "c. 3500 BCE", lat: 31, lng: 46, color: "#f1c40f", desc: "World's earliest known civilization in Mesopotamia." },
-      { name: "Ancient Egyptian Civilization", year: "c. 3100 BCE", lat: 26, lng: 30, color: "#f1c40f", desc: "Civilization along the Nile known for Pharaohs and Pyramids." },
-      { name: "Lord Rama (Ramayana)", year: "Date debated", lat: 26.8, lng: 82.2, color: "#e67e22", desc: "The ancient Indian epic followng the life of Lord Rama." },
-      { name: "Mahabharata", year: "Date debated", lat: 28.9, lng: 76.9, color: "#e67e22", desc: "Details the Kurukshetra War and the Bhagavad Gita." },
-      { name: "Shang Dynasty", year: "c. 1600 BCE", lat: 36, lng: 114, color: "#3498db", desc: "Earliest recorded Chinese dynasty." }
+      { 
+        name: "Lord Rama", 
+        year: "c. 5000 BCE (Debated)", 
+        lat: 26.8, lng: 82.2, 
+        img: "https://cdn-icons-png.flaticon.com/512/2421/2421300.png", // Replace with Rama PNG
+        desc: "The Seventh Avatar of Lord Vishnu and the King of Ayodhya. His life, as recorded in the Ramayana, establishes the principles of Dharma (Righteousness). His reign, 'Ram Rajya', is considered the pinnacle of just governance." 
+      },
+      { 
+        name: "Alexander the Great", 
+        year: "334 BCE", 
+        lat: 40.7, lng: 22.5, 
+        img: "https://cdn-icons-png.flaticon.com/512/2354/2354313.png", // Replace with Alexander PNG
+        desc: "King of the Ancient Greek kingdom of Macedon. He created one of the largest empires in history by age 30, stretching from Greece to northwestern India. He was undefeated in battle and is considered one of history's most successful military commanders." 
+      },
+      { 
+        name: "Adolf Hitler", 
+        year: "1939 (WWII)", 
+        lat: 52.5, lng: 13.4, 
+        img: "https://cdn-icons-png.flaticon.com/512/3041/3041010.png", // Placeholder icon
+        desc: "The leader of Nazi Germany who initiated World War II in Europe by invading Poland. His regime was responsible for the genocide of six million Jews and millions of other victims." 
+      }
     ];
 
+    // --- 2. GLOBE CONFIGURATION ---
     const world = Globe()
       (document.getElementById('globeViz'))
       .globeImageUrl('https://unpkg.com/three-globe/example/img/earth-night.jpg')
       .backgroundImageUrl('https://unpkg.com/three-globe/example/img/night-sky.png')
-      .pointsData(historyData)
-      .pointAltitude(0.1)
-      .pointColor('color')
-      .pointRadius(1.0)
-      .pointLabel(d => `<b>${d.name}</b><br>${d.year}`)
-      .onPointClick(d => showDialogue(d));
+      
+      // THIS IS THE MAGIC: Rendering HTML characters instead of dots
+      .htmlElementsData(historyData)
+      .htmlElement(d => {
+        const el = document.createElement('div');
+        el.className = 'character-container';
+        el.innerHTML = `
+          <img src="${d.img}" class="character-img">
+          <div class="character-label">${d.name}</div>
+        `;
+        
+        // Interaction
+        el.onclick = () => showDialogue(d);
+        return el;
+      })
+      (document.getElementById('globeViz'));
 
+    // --- 3. UI FUNCTIONS ---
     function showDialogue(data) {
       document.getElementById('box-title').innerText = data.name;
-      document.getElementById('box-year').innerText = data.year;
+      document.getElementById('box-year').innerText = "Historical Era: " + data.year;
       document.getElementById('box-desc').innerText = data.desc;
+      
       document.getElementById('box-overlay').style.display = 'block';
       document.getElementById('dialogue-box').style.display = 'block';
+      
+      // Stop the globe while reading
       world.controls().autoRotate = false;
     }
 
@@ -81,7 +137,7 @@
     }
 
     world.controls().autoRotate = true;
-    world.controls().autoRotateSpeed = 0.6;
+    world.controls().autoRotateSpeed = 0.5;
   </script>
 </body>
 </html>

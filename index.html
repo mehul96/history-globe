@@ -2,68 +2,65 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Human History 3D Globe | Figure Edition</title>
+  <title>HistoryGlobe 3D | Clickable Edition</title>
   <script src="https://unpkg.com/three"></script>
   <script src="https://unpkg.com/globe.gl"></script>
   <style>
-    body { margin: 0; background: #000; font-family: 'Segoe UI', sans-serif; overflow: hidden; color: white; }
+    body { margin: 0; background: #000; font-family: 'Georgia', serif; overflow: hidden; color: white; }
     #globeViz { width: 100vw; height: 100vh; }
     
-    /* THE CHARACTER FIGURE STYLING */
-    .figure-container {
+    /* THE FIGURE WRAPPER */
+    .clickable-figure {
         display: flex;
         flex-direction: column;
         align-items: center;
-        cursor: pointer;
-        /* This keeps the feet of the figure on the ground */
-        transform: translate(-50%, -100%); 
-        transition: all 0.3s ease;
+        cursor: pointer !important;
+        pointer-events: auto !important; /* CRITICAL: This allows the click to pass through */
+        transform: translate(-50%, -100%); /* Keeps feet on the ground */
+        transition: all 0.2s ease-in-out;
     }
     
-    .figure-container:hover {
-        transform: translate(-50%, -110%) scale(1.4);
-        z-index: 10;
+    .clickable-figure:hover {
+        transform: translate(-50%, -110%) scale(1.3);
+        filter: brightness(1.2);
     }
 
     .figure-img {
-        width: 60px; /* Size of the historical figure */
+        width: 70px; /* Size of your PNG character */
         height: auto;
-        /* Gives the figure a glowing 'aura' */
-        filter: drop-shadow(0 0 8px rgba(255, 204, 0, 0.8));
+        /* Adds a small shadow under the person */
+        filter: drop-shadow(0 10px 5px rgba(0,0,0,0.5));
     }
 
     .figure-label {
-        background: rgba(0, 0, 0, 0.8);
-        color: #ffcc00;
-        padding: 2px 10px;
-        border-radius: 12px;
-        font-size: 11px;
+        background: #b08d57;
+        color: white;
+        padding: 2px 8px;
+        border-radius: 4px;
+        font-size: 12px;
         font-weight: bold;
-        margin-top: -5px;
-        border: 1px solid #ffcc00;
+        margin-top: 5px;
         white-space: nowrap;
-        pointer-events: none;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.3);
     }
 
-    /* THE POPUP DIALOGUE BOX */
+    /* THE POPUP BOX */
     #info-box {
       position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-      width: 85%; max-width: 550px; background: white; border-radius: 20px;
-      display: none; z-index: 9999; padding: 35px;
-      box-shadow: 0 0 100px rgba(0,0,0,0.9); color: #222;
-      border-top: 8px solid #b08d57;
+      width: 80%; max-width: 600px; max-height: 80vh; overflow-y: auto;
+      background: white; color: #1a1a1a; padding: 40px; border-radius: 12px;
+      display: none; z-index: 10000; box-shadow: 0 0 100px rgba(0,0,0,0.9);
     }
     #box-overlay {
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0,0,0,0.85); display: none; z-index: 9998;
+      background: rgba(0,0,0,0.85); display: none; z-index: 9999;
     }
     .back-btn {
-      background: #b08d57; color: white; border: none; padding: 12px 24px;
-      border-radius: 50px; cursor: pointer; font-weight: bold; margin-bottom: 20px;
-      text-transform: uppercase; letter-spacing: 1px;
+      background: #b08d57; color: white; border: none; padding: 12px 25px;
+      border-radius: 4px; cursor: pointer; font-weight: bold; margin-bottom: 20px;
     }
-    h2 { margin-top: 0; font-size: 2.2rem; font-family: serif; }
-    p { line-height: 1.8; font-size: 1.1rem; color: #444; }
+    h2 { margin: 0; font-size: 2.5rem; border-bottom: 2px solid #f0f0f0; padding-bottom: 10px; }
+    #box-year { color: #b08d57; font-weight: bold; font-family: sans-serif; margin-bottom: 20px; }
   </style>
 </head>
 <body>
@@ -72,92 +69,79 @@
 
   <div id="box-overlay" onclick="closeBox()"></div>
   <div id="info-box">
-    <button class="back-btn" onclick="closeBox()">✕ Back to Earth</button>
-    <p id="box-year" style="color: #b08d57; font-weight: bold; text-transform: uppercase; margin:0;"></p>
+    <button class="back-btn" onclick="closeBox()">✕ BACK TO EXPLORATION</button>
+    <div id="box-year"></div>
     <h2 id="box-title"></h2>
-    <hr style="opacity: 0.2; margin: 20px 0;">
-    <p id="box-desc"></p>
+    <p id="box-desc" style="line-height: 1.8; font-size: 1.2rem;"></p>
   </div>
 
   <script>
-    // --- 1. HISTORICAL DATASET ---
-    // You can swap these image URLs for actual PNGs of the characters later
+    // --- DATASET: Swap 'img' for your PNG filenames ---
     const historyData = [
       { 
         name: "Agricultural Revolution", year: "c. 10,000 BCE", lat: 33, lng: 44, 
-        img: "https://cdn-icons-png.flaticon.com/512/2329/2329061.png", 
-        desc: "The dawn of human civilization. Humans transitioned from wandering hunters to settled farmers in the Fertile Crescent, leading to the first permanent cities." 
+        img: "https://cdn-icons-png.flaticon.com/512/2329/2329061.png", // Replace with your PNG
+        desc: "The transition from hunting and gathering to settled agriculture in the Fertile Crescent. This allowed for permanent settlements and the rise of the first organized societies."
+      },
+      { 
+        name: "Lord Rama", year: "c. 5000 BCE (Debated)", lat: 26.8, lng: 82.2, 
+        img: "https://cdn-icons-png.flaticon.com/512/2421/2421300.png", // Replace with your PNG
+        desc: "Lord Rama, the seventh avatar of Lord Vishnu, whose life is chronicled in the Ramayana. He is a symbol of Dharma and the perfect man (Maryada Purushottama)."
       },
       { 
         name: "Ancient Egyptian Pharaoh", year: "c. 3100 BCE", lat: 26, lng: 30, 
-        img: "https://cdn-icons-png.flaticon.com/512/3752/3752311.png", 
-        desc: "Unified by King Narmer, Ancient Egypt became a global power of engineering and spirituality, creating the Pyramids and a culture that lasted for 3,000 years." 
+        img: "https://cdn-icons-png.flaticon.com/512/3752/3752311.png", // Replace with your PNG
+        desc: "The unification of Upper and Lower Egypt under King Narmer. This period saw the birth of the Pharaohs and the construction of the earliest monuments."
       },
       { 
-        name: "Lord Rama", year: "Date Debated", lat: 26.8, lng: 82.2, 
-        img: "https://cdn-icons-png.flaticon.com/512/2421/2421300.png", 
-        desc: "The Seventh Avatar of Vishnu. His journey from Ayodhya to Lanka represents the triumph of Dharma over Adharma. He is the ultimate symbol of the ideal King and human." 
-      },
-      { 
-        name: "Alexander the Great", year: "334 BCE", lat: 40.7, lng: 22.5, 
-        img: "https://cdn-icons-png.flaticon.com/512/2354/2354313.png", 
-        desc: "The Macedonian King who conquered the known world from Greece to the borders of India. His conquests blended cultures and changed history forever." 
-      },
-      { 
-        name: "Adolf Hitler", year: "1939 (WWII)", lat: 52.5, lng: 13.4, 
-        img: "https://cdn-icons-png.flaticon.com/512/3041/3041010.png", 
-        desc: "Leader of Nazi Germany. His invasion of Poland sparked World War II, the deadliest conflict in human history, leading to the fall of empires and the birth of the modern world." 
+        name: "Alexander the Great", year: "334 BCE", lat: 37.9, lng: 23.7, 
+        img: "https://cdn-icons-png.flaticon.com/512/2354/2354313.png", // Replace with your PNG
+        desc: "King of Macedon who conquered the Persian Empire and reached the edges of India, creating one of the largest empires and spreading Hellenistic culture."
       }
     ];
 
-    // --- 2. GLOBE CONFIGURATION ---
     const world = Globe()
       (document.getElementById('globeViz'))
       .globeImageUrl('https://unpkg.com/three-globe/example/img/earth-night.jpg')
       .backgroundImageUrl('https://unpkg.com/three-globe/example/img/night-sky.png')
       
-      // ENSURE NO CYLINDERS: We only use htmlElementsData
       .htmlElementsData(historyData)
       .htmlElement(d => {
         const el = document.createElement('div');
-        el.className = 'figure-container';
+        el.className = 'clickable-figure';
         el.innerHTML = `
           <img src="${d.img}" class="figure-img">
           <div class="figure-label">${d.name}</div>
         `;
         
-        // When clicking the character figure
-        el.onclick = () => showDialogue(d);
-        
-        // Hover effect for labels
-        el.onmouseenter = () => { console.log("Discovering:", d.name); };
-        
+        // This is the click logic
+        el.addEventListener('click', (event) => {
+          event.stopPropagation(); // Prevents clicking "through" the person into Earth
+          showDialogue(d);
+        });
+
         return el;
       })
       (document.getElementById('globeViz'));
 
-    // --- 3. UI FUNCTIONS ---
     function showDialogue(data) {
       document.getElementById('box-title').innerText = data.name;
-      document.getElementById('box-year').innerText = "ERA: " + data.year;
+      document.getElementById('box-year').innerText = data.year;
       document.getElementById('box-desc').innerText = data.desc;
       
       document.getElementById('box-overlay').style.display = 'block';
       document.getElementById('info-box').style.display = 'block';
-      
-      world.controls().autoRotate = false; // Stop Earth while reading
+      world.controls().autoRotate = false;
     }
 
     function closeBox() {
       document.getElementById('box-overlay').style.display = 'none';
       document.getElementById('info-box').style.display = 'none';
-      world.controls().autoRotate = true; // Resume Earth spin
+      world.controls().autoRotate = true;
     }
 
-    // Auto-spin settings
     world.controls().autoRotate = true;
-    world.controls().autoRotateSpeed = 0.4;
-    world.controls().enableDamping = true; // Smooth gliding spin
+    world.controls().autoRotateSpeed = 0.5;
   </script>
 </body>
 </html>

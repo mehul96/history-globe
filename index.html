@@ -3,21 +3,23 @@
 <head>
   <meta charset="UTF-8">
   <title>Human History 3D Globe</title>
-  <script src="//unpkg.com/globe.gl"></script>
+  <!-- Force HTTPS for libraries -->
+  <script src="https://unpkg.com/three"></script>
+  <script src="https://unpkg.com/globe.gl"></script>
   <style>
-    body { margin: 0; background: #000; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; overflow: hidden; }
+    body { margin: 0; background: #000; font-family: 'Segoe UI', sans-serif; overflow: hidden; color: white; }
     #globeViz { width: 100vw; height: 100vh; }
     
-    /* THE DIALOGUE BOX (MODAL) */
+    /* THE DIALOGUE BOX */
     #dialogue-box {
       position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-      width: 80%; max-width: 600px; background: white; border-radius: 15px;
+      width: 85%; max-width: 600px; background: white; border-radius: 15px;
       display: none; z-index: 1000; padding: 30px;
       box-shadow: 0 0 50px rgba(0,0,0,0.8); color: #333;
     }
     #box-overlay {
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0,0,0,0.7); display: none; z-index: 999;
+      background: rgba(0,0,0,0.8); display: none; z-index: 999;
     }
     .back-btn {
       background: #E31837; color: white; border: none; padding: 10px 20px;
@@ -32,64 +34,54 @@
 
   <div id="globeViz"></div>
 
-  <!-- Dialogue Box UI -->
   <div id="box-overlay" onclick="closeBox()"></div>
   <div id="dialogue-box">
     <button class="back-btn" onclick="closeBox()">← BACK TO GLOBE</button>
     <div id="content">
         <p class="label" id="box-year"></p>
         <h2 id="box-title"></h2>
-        <p class="label">Historical Context</p>
         <p id="box-desc"></p>
     </div>
   </div>
 
   <script>
-    // --- 1. YOUR HISTORICAL DATA ---
     const historyData = [
-      { name: "Agricultural Revolution", year: "c. 10,000 BCE", country: "Iraq / Levant", lat: 33, lng: 44, color: "green", desc: "The transition from hunting and gathering to settled agriculture. This allowed for the first permanent human settlements and the birth of civilization." },
-      { name: "Sumerian Civilization", year: "c. 3500 BCE", country: "Iraq", lat: 31, lng: 46, color: "gold", desc: "One of the world's earliest known civilizations, Sumerians invented the first writing system and the wheel." },
-      { name: "Invention of Writing", year: "c. 3400 BCE", country: "Iraq", lat: 32, lng: 45, color: "blue", desc: "The development of Cuneiform by Sumerians allowed humans to record history, laws, and literature for the first time." },
-      { name: "Ancient Egyptian Civilization", year: "c. 3100 BCE", country: "Egypt", lat: 26, lng: 30, color: "gold", desc: "A civilization famous for its pharaohs, hieroglyphics, and monumental architecture along the Nile River." },
-      { name: "Great Pyramid of Giza", year: "c. 2560 BCE", country: "Egypt", lat: 29.9, lng: 31.1, color: "white", desc: "Built as a tomb for Pharaoh Khufu, it remained the tallest man-made structure in the world for over 3,800 years." },
-      { name: "Indus Valley Civilization", year: "c. 3300 BCE", country: "Pakistan / India", lat: 27, lng: 68, color: "orange", desc: "An advanced Bronze Age civilization known for its urban planning, baked brick houses, and sophisticated drainage systems." },
-      { name: "Code of Hammurabi", year: "c. 1754 BCE", country: "Iraq", lat: 32.5, lng: 44.4, color: "red", desc: "One of the oldest deciphered writings of significant length in the world, establishing the 'eye for an eye' legal principle." },
-      { name: "Vedic Period", year: "c. 1500 BCE", country: "India / Pakistan", lat: 30, lng: 74, color: "saffron", desc: "The period when the Vedas, the oldest scriptures of Hinduism, were composed, laying the foundation for Indian culture." },
-      { name: "Ramayana Tradition", year: "Date debated", country: "India / Sri Lanka", lat: 26.8, lng: 82.2, color: "orange", desc: "The ancient Indian epic following the life of Lord Rama. It is a cornerstone of global literature and Dharmic philosophy." },
-      { name: "Mahabharata Tradition", year: "Date debated", country: "India", lat: 28.9, lng: 76.9, color: "orange", desc: "One of the two major Sanskrit epics of ancient India, detailing the Kurukshetra War and the teachings of the Bhagavad Gita." },
-      { name: "Shang Dynasty", year: "c. 1600 BCE", country: "China", lat: 36, lng: 114, color: "cyan", desc: "The earliest ruling dynasty of China to be established in recorded history, known for its advances in math, astronomy, and bronze-working." }
+      { name: "Agricultural Revolution", year: "c. 10,000 BCE", lat: 33, lng: 44, color: "#2ecc71", desc: "The transition from hunting and gathering to settled agriculture." },
+      { name: "Sumerian Civilization", year: "c. 3500 BCE", lat: 31, lng: 46, color: "#f1c40f", desc: "World's earliest known civilization in Mesopotamia." },
+      { name: "Ancient Egyptian Civilization", year: "c. 3100 BCE", lat: 26, lng: 30, color: "#f1c40f", desc: "Civilization along the Nile known for Pharaohs and Pyramids." },
+      { name: "Lord Rama (Ramayana)", year: "Date debated", lat: 26.8, lng: 82.2, color: "#e67e22", desc: "The ancient Indian epic followng the life of Lord Rama." },
+      { name: "Mahabharata", year: "Date debated", lat: 28.9, lng: 76.9, color: "#e67e22", desc: "Details the Kurukshetra War and the Bhagavad Gita." },
+      { name: "Shang Dynasty", year: "c. 1600 BCE", lat: 36, lng: 114, color: "#3498db", desc: "Earliest recorded Chinese dynasty." }
     ];
 
-    // --- 2. INITIALIZE GLOBE ---
-    const myGlobe = Globe()
+    const world = Globe()
       (document.getElementById('globeViz'))
-      .globeImageUrl('//unpkg.com/three-globe/example/img/earth-night.jpg')
-      .backgroundImageUrl('//unpkg.com/three-globe/example/img/night-sky.png')
-      .pointData(historyData)
+      .globeImageUrl('https://unpkg.com/three-globe/example/img/earth-night.jpg')
+      .backgroundImageUrl('https://unpkg.com/three-globe/example/img/night-sky.png')
+      .pointsData(historyData)
       .pointAltitude(0.1)
       .pointColor('color')
-      .pointRadius(0.8)
-      .pointLabel(d => `<b>${d.name}</b><br>${d.year} | ${d.country}`) // Hover tooltip
-      .onPointClick(d => showDialogue(d)); // Click interaction
+      .pointRadius(1.0)
+      .pointLabel(d => `<b>${d.name}</b><br>${d.year}`)
+      .onPointClick(d => showDialogue(d));
 
-    // --- 3. DIALOGUE FUNCTIONS ---
     function showDialogue(data) {
       document.getElementById('box-title').innerText = data.name;
-      document.getElementById('box-year').innerText = data.year + " | " + data.country;
-      document.getElementById('box-desc').innerText = data.detail || data.desc;
-      
+      document.getElementById('box-year').innerText = data.year;
+      document.getElementById('box-desc').innerText = data.desc;
       document.getElementById('box-overlay').style.display = 'block';
       document.getElementById('dialogue-box').style.display = 'block';
+      world.controls().autoRotate = false;
     }
 
     function closeBox() {
       document.getElementById('box-overlay').style.display = 'none';
       document.getElementById('dialogue-box').style.display = 'none';
+      world.controls().autoRotate = true;
     }
 
-    // Auto-rotate the globe slightly
-    myGlobe.controls().autoRotate = true;
-    myGlobe.controls().autoRotateSpeed = 0.5;
+    world.controls().autoRotate = true;
+    world.controls().autoRotateSpeed = 0.6;
   </script>
 </body>
 </html>

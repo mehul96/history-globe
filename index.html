@@ -2,18 +2,19 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>HistoryGlobe 3D | Master Edition</title>
-  <script src="https://unpkg.com/three"></script>
+  <title>HistoryGlobe 3D | Fixed & Pinned</title>
+  <!-- Only one script needed. It includes Three.js internally -->
   <script src="https://unpkg.com/globe.gl"></script>
   <style>
     body { margin: 0; background: #000; font-family: 'Georgia', serif; overflow: hidden; color: white; }
     #globeViz { width: 100vw; height: 100vh; }
     
+    /* THE DIALOGUE BOX */
     #info-box {
       position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-      width: 85%; max-width: 550px; background: white; border-radius: 20px;
-      display: none; z-index: 10000; padding: 35px;
-      box-shadow: 0 0 100px rgba(0,0,0,0.9); color: #222;
+      width: 85%; max-width: 550px; max-height: 80vh; overflow-y: auto;
+      background: white; color: #1a1a1a; padding: 40px; border-radius: 20px;
+      display: none; z-index: 10000; box-shadow: 0 0 100px rgba(0,0,0,0.9);
       border-top: 8px solid #b08d57;
     }
     #box-overlay {
@@ -23,7 +24,10 @@
     .back-btn {
       background: #b08d57; color: white; border: none; padding: 12px 24px;
       border-radius: 50px; cursor: pointer; font-weight: bold; margin-bottom: 20px;
+      text-transform: uppercase; letter-spacing: 1px;
     }
+    h2 { margin: 0; font-size: 2.2rem; }
+    #box-year { color: #b08d57; font-weight: bold; margin-bottom: 10px; text-transform: uppercase; }
   </style>
 </head>
 <body>
@@ -32,60 +36,55 @@
 
   <div id="box-overlay" onclick="closeBox()"></div>
   <div id="info-box">
-    <button class="back-btn" onclick="closeBox()">✕ BACK TO EARTH</button>
-    <div id="box-year" style="color: #b08d57; font-weight: bold; margin-bottom: 10px;"></div>
-    <h2 id="box-title" style="margin:0;"></h2>
+    <button class="back-btn" onclick="closeBox()">✕ BACK TO NAVIGATION</button>
+    <div id="box-year"></div>
+    <h2 id="box-title"></h2>
     <hr style="opacity: 0.2; margin: 20px 0;">
     <p id="box-desc" style="line-height: 1.8; font-size: 1.1rem; color: #444;"></p>
   </div>
 
   <script>
     // --- 1. DATASET ---
-    // Ensure filenames match your GitHub 'images' folder EXACTLY
+    // Make sure these filenames match your GitHub 'images' folder exactly
     const historyData = [
       { 
         name: "Lord Rama", year: "Date Debated", lat: 26.8, lng: 82.2, 
-        img: "images/rama.png", 
-        desc: "The Seventh Avatar of Vishnu and the King of Ayodhya."
+        img: "./images/rama.png", 
+        desc: "The Seventh Avatar of Lord Vishnu and the King of Ayodhya. Lord Rama's life serves as the ultimate guide to Dharma (righteousness)."
       },
       { 
         name: "Alexander the Great", year: "334 BCE", lat: 37.9, lng: 23.7, 
-        img: "images/alexander.png", 
-        desc: "Macedonian King who conquered the known world."
+        img: "./images/alexander.png", 
+        desc: "The Macedonian King who conquered the Persian Empire and established a vast empire reaching the Indus Valley."
       },
       { 
         name: "Adolf Hitler", year: "1939 (WWII)", lat: 52.5, lng: 13.4, 
-        img: "images/hitler.png", 
-        desc: "Leader of Nazi Germany during World War II."
+        img: "./images/hitler.png", 
+        desc: "Leader of Nazi Germany. His invasion of Poland triggered World War II, the deadliest conflict in human history."
       }
     ];
 
     // --- 2. GLOBE INITIALIZATION ---
+    // Initialize after the DOM is ready
     const world = Globe()
       (document.getElementById('globeViz'))
       .globeImageUrl('https://unpkg.com/three-globe/example/img/earth-night.jpg')
       .backgroundImageUrl('https://unpkg.com/three-globe/example/img/night-sky.png')
       
+      // CUSTOM 3D LAYER FOR CHARACTERS
       .customLayerData(historyData)
-      .customLayerElement(d => {
-        // Create a 3D Sprite Group
-        const g = new THREE.Group();
-
-        // 1. Create the Sprite (The Character)
+      .customLayerThreeObject(d => {
+        // Access THREE from the globe.gl internal instance
         const loader = new THREE.TextureLoader();
-        const texture = loader.load(d.img, 
-            undefined, // onLoad success
-            undefined, // onProgress
-            (err) => console.error("Could not load image: " + d.img) // onError
-        );
+        const texture = loader.load(d.img);
         
+        // Create the 3D Sprite (Billboard)
         const material = new THREE.SpriteMaterial({ map: texture, transparent: true });
         const sprite = new THREE.Sprite(material);
-        sprite.scale.set(15, 15, 1); // Size of character
-        sprite.position.y = 7; // Lift it slightly so feet touch ground
         
-        g.add(sprite);
-        return g;
+        // Scaling: Change 15 to make them bigger or smaller
+        sprite.scale.set(15, 15, 1); 
+        return sprite;
       })
       .onCustomLayerClick(d => showDialogue(d));
 
@@ -105,6 +104,7 @@
       world.controls().autoRotate = true;
     }
 
+    // Auto-spin settings
     world.controls().autoRotate = true;
     world.controls().autoRotateSpeed = 0.5;
   </script>

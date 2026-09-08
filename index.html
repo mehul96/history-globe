@@ -47,22 +47,28 @@
     // --- 1. DATASET ---
     // Ensure these paths match your "images" folder on GitHub!
     const historyData = [
-      { 
-        name: "Lord Rama", year: "Date Debated", lat: 26.8, lng: 82.2, 
-        img: "images/rama.png", 
-        desc: "The Seventh Avatar of Lord Vishnu. Lord Rama's life, chronicled in the Ramayana, serves as the ultimate guide to Dharma (righteousness) and the ideal of 'Maryada Purushottama'."
-      },
-      { 
-        name: "Alexander the Great", year: "334 BCE", lat: 37.9, lng: 23.7, 
-        img: "images/alexander.png", 
-        desc: "The King of Macedon who conquered the Persian Empire and established a vast empire reaching the Indus Valley, spreading Hellenistic influence across three continents."
-      },
-      { 
-        name: "Adolf Hitler", year: "1939 (WWII)", lat: 52.5, lng: 13.4, 
-        img: "images/hitler.png", 
-        desc: "Leader of Nazi Germany. His invasion of Poland triggered World War II, the deadliest conflict in human history, fundamentally altering global geopolitics."
-      }
-    ];
+  { 
+    name: "Lord Rama", 
+    year: "Date Debated", 
+    lat: 26.8, lng: 82.2, 
+    img: "images/rama.png", // <--- It MUST have 'images/' at the start
+    desc: "..."
+  },
+  { 
+    name: "Alexander the Great", 
+    year: "334 BCE", 
+    lat: 37.9, lng: 23.7, 
+    img: "images/alexander.png", // <--- It MUST have 'images/' at the start
+    desc: "..."
+  },
+       { 
+    name: "Hitler", 
+    year: "1939 (WW2)", 
+    lat: 52.5, lng: 13.4,
+    img: "images/hitler.png", // <--- It MUST have 'images/' at the start
+    desc: "..."
+  }
+];
 
     // --- 2. INITIALIZE GLOBE ---
     const world = Globe()

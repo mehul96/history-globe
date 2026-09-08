@@ -2,32 +2,28 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>HistoryGlobe 3D | Locked Figures</title>
+  <title>HistoryGlobe 3D | Master Edition</title>
   <script src="https://unpkg.com/three"></script>
   <script src="https://unpkg.com/globe.gl"></script>
   <style>
     body { margin: 0; background: #000; font-family: 'Georgia', serif; overflow: hidden; color: white; }
     #globeViz { width: 100vw; height: 100vh; }
     
-    /* THE DIALOGUE BOX */
     #info-box {
       position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-      width: 85%; max-width: 550px; max-height: 80vh; overflow-y: auto;
-      background: white; color: #1a1a1a; padding: 40px; border-radius: 20px;
-      display: none; z-index: 10000; box-shadow: 0 0 100px rgba(0,0,0,0.9);
-      border-top: 10px solid #b08d57;
+      width: 85%; max-width: 550px; background: white; border-radius: 20px;
+      display: none; z-index: 10000; padding: 35px;
+      box-shadow: 0 0 100px rgba(0,0,0,0.9); color: #222;
+      border-top: 8px solid #b08d57;
     }
     #box-overlay {
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
       background: rgba(0,0,0,0.85); display: none; z-index: 9999;
     }
     .back-btn {
-      background: #b08d57; color: white; border: none; padding: 12px 25px;
+      background: #b08d57; color: white; border: none; padding: 12px 24px;
       border-radius: 50px; cursor: pointer; font-weight: bold; margin-bottom: 20px;
-      text-transform: uppercase; letter-spacing: 1px;
     }
-    h2 { margin: 0; font-size: 2.2rem; }
-    #box-year { color: #b08d57; font-weight: bold; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 2px; }
   </style>
 </head>
 <body>
@@ -36,83 +32,70 @@
 
   <div id="box-overlay" onclick="closeBox()"></div>
   <div id="info-box">
-    <button class="back-btn" onclick="closeBox()">✕ BACK TO NAVIGATION</button>
-    <div id="box-year"></div>
-    <h2 id="box-title"></h2>
+    <button class="back-btn" onclick="closeBox()">✕ BACK TO EARTH</button>
+    <div id="box-year" style="color: #b08d57; font-weight: bold; margin-bottom: 10px;"></div>
+    <h2 id="box-title" style="margin:0;"></h2>
     <hr style="opacity: 0.2; margin: 20px 0;">
     <p id="box-desc" style="line-height: 1.8; font-size: 1.1rem; color: #444;"></p>
   </div>
 
   <script>
     // --- 1. DATASET ---
-    // Ensure these paths match your "images" folder on GitHub!
+    // Ensure filenames match your GitHub 'images' folder EXACTLY
     const historyData = [
-  { 
-    name: "Lord Rama", 
-    year: "Date Debated", 
-    lat: 26.8, lng: 82.2, 
-    img: "images/rama.png", // <--- It MUST have 'images/' at the start
-    desc: "..."
-  },
-  { 
-    name: "Alexander the Great", 
-    year: "334 BCE", 
-    lat: 37.9, lng: 23.7, 
-    img: "images/alexander.png", // <--- It MUST have 'images/' at the start
-    desc: "..."
-  },
-       { 
-    name: "Hitler", 
-    year: "1939 (WW2)", 
-    lat: 52.5, lng: 13.4,
-    img: "images/hitler.png", // <--- It MUST have 'images/' at the start
-    desc: "..."
-  }
-];
+      { 
+        name: "Lord Rama", year: "Date Debated", lat: 26.8, lng: 82.2, 
+        img: "images/rama.png", 
+        desc: "The Seventh Avatar of Vishnu and the King of Ayodhya."
+      },
+      { 
+        name: "Alexander the Great", year: "334 BCE", lat: 37.9, lng: 23.7, 
+        img: "images/alexander.png", 
+        desc: "Macedonian King who conquered the known world."
+      },
+      { 
+        name: "Adolf Hitler", year: "1939 (WWII)", lat: 52.5, lng: 13.4, 
+        img: "images/hitler.png", 
+        desc: "Leader of Nazi Germany during World War II."
+      }
+    ];
 
-    // --- 2. INITIALIZE GLOBE ---
+    // --- 2. GLOBE INITIALIZATION ---
     const world = Globe()
       (document.getElementById('globeViz'))
       .globeImageUrl('https://unpkg.com/three-globe/example/img/earth-night.jpg')
       .backgroundImageUrl('https://unpkg.com/three-globe/example/img/night-sky.png')
       
-      // THE FIX: Using 3D Objects that are physically part of the globe's coordinate system
-      .objectsData(historyData)
-      .objectLat(d => d.lat)
-      .objectLng(d => d.lng)
-      .objectAltitude(0.01) // Distance from the surface (0.01 = touching the ground)
-      .objectThreeObject(d => {
-        // Create the 3D 'Billboard' (A sprite that always faces the camera)
+      .customLayerData(historyData)
+      .customLayerElement(d => {
+        // Create a 3D Sprite Group
+        const g = new THREE.Group();
+
+        // 1. Create the Sprite (The Character)
         const loader = new THREE.TextureLoader();
-        const texture = loader.load(d.img);
+        const texture = loader.load(d.img, 
+            undefined, // onLoad success
+            undefined, // onProgress
+            (err) => console.error("Could not load image: " + d.img) // onError
+        );
         
-        // Ensure image doesn't look pixelated
-        texture.minFilter = THREE.LinearFilter;
-        
-        const material = new THREE.SpriteMaterial({ 
-            map: texture,
-            transparent: true,
-            depthTest: true // This prevents them from being seen through the Earth
-        });
-        
+        const material = new THREE.SpriteMaterial({ map: texture, transparent: true });
         const sprite = new THREE.Sprite(material);
+        sprite.scale.set(15, 15, 1); // Size of character
+        sprite.position.y = 7; // Lift it slightly so feet touch ground
         
-        // SIZE: Increase these numbers to make characters bigger
-        sprite.scale.set(15, 15, 1); 
-        
-        return sprite;
+        g.add(sprite);
+        return g;
       })
-      .onObjectClick(d => showDialogue(d));
+      .onCustomLayerClick(d => showDialogue(d));
 
     // --- 3. UI FUNCTIONS ---
     function showDialogue(data) {
       document.getElementById('box-title').innerText = data.name;
-      document.getElementById('box-year').innerText = "Timeline: " + data.year;
+      document.getElementById('box-year').innerText = "ERA: " + data.year;
       document.getElementById('box-desc').innerText = data.desc;
-      
       document.getElementById('box-overlay').style.display = 'block';
       document.getElementById('info-box').style.display = 'block';
-      
       world.controls().autoRotate = false;
     }
 
@@ -122,10 +105,8 @@
       world.controls().autoRotate = true;
     }
 
-    // Auto-spin logic
     world.controls().autoRotate = true;
     world.controls().autoRotateSpeed = 0.5;
-    world.controls().enableDamping = true; 
   </script>
 </body>
 </html>

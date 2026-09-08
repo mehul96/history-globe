@@ -2,49 +2,14 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>HistoryGlobe 3D | Clickable Edition</title>
+  <title>HistoryGlobe 3D | Fixed Pins</title>
   <script src="https://unpkg.com/three"></script>
   <script src="https://unpkg.com/globe.gl"></script>
   <style>
     body { margin: 0; background: #000; font-family: 'Georgia', serif; overflow: hidden; color: white; }
     #globeViz { width: 100vw; height: 100vh; }
     
-    /* THE FIGURE WRAPPER */
-    .clickable-figure {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        cursor: pointer !important;
-        pointer-events: auto !important; /* CRITICAL: This allows the click to pass through */
-        transform: translate(-50%, -100%); /* Keeps feet on the ground */
-        transition: all 0.2s ease-in-out;
-    }
-    
-    .clickable-figure:hover {
-        transform: translate(-50%, -110%) scale(1.3);
-        filter: brightness(1.2);
-    }
-
-    .figure-img {
-        width: 70px; /* Size of your PNG character */
-        height: auto;
-        /* Adds a small shadow under the person */
-        filter: drop-shadow(0 10px 5px rgba(0,0,0,0.5));
-    }
-
-    .figure-label {
-        background: #b08d57;
-        color: white;
-        padding: 2px 8px;
-        border-radius: 4px;
-        font-size: 12px;
-        font-weight: bold;
-        margin-top: 5px;
-        white-space: nowrap;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.3);
-    }
-
-    /* THE POPUP BOX */
+    /* THE POPUP DIALOGUE BOX */
     #info-box {
       position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
       width: 80%; max-width: 600px; max-height: 80vh; overflow-y: auto;
@@ -60,7 +25,7 @@
       border-radius: 4px; cursor: pointer; font-weight: bold; margin-bottom: 20px;
     }
     h2 { margin: 0; font-size: 2.5rem; border-bottom: 2px solid #f0f0f0; padding-bottom: 10px; }
-    #box-year { color: #b08d57; font-weight: bold; font-family: sans-serif; margin-bottom: 20px; }
+    #box-year { color: #b08d57; font-weight: bold; margin-bottom: 10px; text-transform: uppercase; }
   </style>
 </head>
 <body>
@@ -69,58 +34,57 @@
 
   <div id="box-overlay" onclick="closeBox()"></div>
   <div id="info-box">
-    <button class="back-btn" onclick="closeBox()">✕ BACK TO EXPLORATION</button>
+    <button class="back-btn" onclick="closeBox()">✕ BACK TO EARTH</button>
     <div id="box-year"></div>
     <h2 id="box-title"></h2>
     <p id="box-desc" style="line-height: 1.8; font-size: 1.2rem;"></p>
   </div>
 
   <script>
-    // --- DATASET: Swap 'img' for your PNG filenames ---
+    // --- 1. DATASET ---
+    // IMPORTANT: Make sure your image paths match your GitHub folder exactly!
     const historyData = [
-  { 
-    name: "Lord Rama", 
-    year: "c. 5000 BCE", 
-    lat: 26.8, lng: 82.2, 
-    img: "images/rama.png", // Point to the folder/filename
-    desc: "Lord Rama, the seventh avatar of Lord Vishnu..."
-  },
-  { 
-    name: "Alexander the Great", 
-    year: "334 BCE", 
-    lat: 37.9, lng: 23.7, 
-    img: "images/alexander.png", // Point to the folder/filename
-    desc: "King of Macedon who conquered the Persian Empire..."
-  }
-];
+      { 
+        name: "Lord Rama", year: "Date Debated", lat: 26.8, lng: 82.2, 
+        img: "images/rama.png", 
+        desc: "Lord Rama, the seventh avatar of Lord Vishnu, whose life is chronicled in the Ramayana. He is a symbol of Dharma and the perfect man."
+      },
+      { 
+        name: "Alexander the Great", year: "334 BCE", lat: 37.9, lng: 23.7, 
+        img: "images/alexander.png", 
+        desc: "King of Macedon who conquered the Persian Empire and reached the edges of India."
+      },
+      { 
+        name: "Adolf Hitler", year: "1939 (WWII)", lat: 52.5, lng: 13.4, 
+        img: "images/hitler.png", 
+        desc: "The leader of Nazi Germany who initiated World War II in Europe."
+      }
+    ];
 
+    // --- 2. INITIALIZE GLOBE ---
     const world = Globe()
       (document.getElementById('globeViz'))
       .globeImageUrl('https://unpkg.com/three-globe/example/img/earth-night.jpg')
       .backgroundImageUrl('https://unpkg.com/three-globe/example/img/night-sky.png')
       
-      .htmlElementsData(historyData)
-      .htmlElement(d => {
-        const el = document.createElement('div');
-        el.className = 'clickable-figure';
-        el.innerHTML = `
-          <img src="${d.img}" class="figure-img">
-          <div class="figure-label">${d.name}</div>
-        `;
+      // THIS IS THE FIX: Using 3D Sprites instead of HTML stickers
+      .customLayerData(historyData)
+      .customLayerElement(d => {
+        // Create an image loader
+        const imgTexture = new THREE.TextureLoader().load(d.img);
+        const material = new THREE.SpriteMaterial({ map: imgTexture, transparent: true });
+        const sprite = new THREE.Sprite(material);
         
-        // This is the click logic
-        el.addEventListener('click', (event) => {
-          event.stopPropagation(); // Prevents clicking "through" the person into Earth
-          showDialogue(d);
-        });
-
-        return el;
+        // Scale the character (size on globe)
+        sprite.scale.set(12, 12, 1); 
+        return sprite;
       })
-      (document.getElementById('globeViz'));
+      .onCustomLayerClick(d => showDialogue(d));
 
+    // --- 3. UI FUNCTIONS ---
     function showDialogue(data) {
       document.getElementById('box-title').innerText = data.name;
-      document.getElementById('box-year').innerText = data.year;
+      document.getElementById('box-year').innerText = "Era: " + data.year;
       document.getElementById('box-desc').innerText = data.desc;
       
       document.getElementById('box-overlay').style.display = 'block';

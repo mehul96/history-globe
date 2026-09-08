@@ -367,7 +367,7 @@ In summary, Hitler's story is not one of achievement but a historical warning of
     function showDialogue(data) {
       document.getElementById('box-title').innerText = data.name;
       document.getElementById('box-year').innerText = "ERA: " + data.year;
-      document.getElementById('box-desc').innerText = data.desc;
+      document.getElementById('box-desc').innerHTML = data.desc;
       document.getElementById('box-overlay').style.display = 'block';
       document.getElementById('info-box').style.display = 'block';
       world.controls().autoRotate = false;

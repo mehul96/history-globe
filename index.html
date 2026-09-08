@@ -78,27 +78,21 @@
   <script>
     // --- DATASET: Swap 'img' for your PNG filenames ---
     const historyData = [
-      { 
-        name: "Agricultural Revolution", year: "c. 10,000 BCE", lat: 33, lng: 44, 
-        img: "https://cdn-icons-png.flaticon.com/512/2329/2329061.png", // Replace with your PNG
-        desc: "The transition from hunting and gathering to settled agriculture in the Fertile Crescent. This allowed for permanent settlements and the rise of the first organized societies."
-      },
-      { 
-        name: "Lord Rama", year: "c. 5000 BCE (Debated)", lat: 26.8, lng: 82.2, 
-        img: "https://cdn-icons-png.flaticon.com/512/2421/2421300.png", // Replace with your PNG
-        desc: "Lord Rama, the seventh avatar of Lord Vishnu, whose life is chronicled in the Ramayana. He is a symbol of Dharma and the perfect man (Maryada Purushottama)."
-      },
-      { 
-        name: "Ancient Egyptian Pharaoh", year: "c. 3100 BCE", lat: 26, lng: 30, 
-        img: "https://cdn-icons-png.flaticon.com/512/3752/3752311.png", // Replace with your PNG
-        desc: "The unification of Upper and Lower Egypt under King Narmer. This period saw the birth of the Pharaohs and the construction of the earliest monuments."
-      },
-      { 
-        name: "Alexander the Great", year: "334 BCE", lat: 37.9, lng: 23.7, 
-        img: "https://cdn-icons-png.flaticon.com/512/2354/2354313.png", // Replace with your PNG
-        desc: "King of Macedon who conquered the Persian Empire and reached the edges of India, creating one of the largest empires and spreading Hellenistic culture."
-      }
-    ];
+  { 
+    name: "Lord Rama", 
+    year: "c. 5000 BCE", 
+    lat: 26.8, lng: 82.2, 
+    img: "images/rama.png", // Point to the folder/filename
+    desc: "Lord Rama, the seventh avatar of Lord Vishnu..."
+  },
+  { 
+    name: "Alexander the Great", 
+    year: "334 BCE", 
+    lat: 37.9, lng: 23.7, 
+    img: "images/alexander.png", // Point to the folder/filename
+    desc: "King of Macedon who conquered the Persian Empire..."
+  }
+];
 
     const world = Globe()
       (document.getElementById('globeViz'))

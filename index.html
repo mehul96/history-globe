@@ -2,19 +2,53 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>HistoryGlobe 3D | Fixed & Pinned</title>
-  <!-- Only one script needed. It includes Three.js internally -->
+  <title>HistoryGlobe 3D</title>
+  <!-- Using the standard browser-ready library -->
   <script src="https://unpkg.com/globe.gl"></script>
   <style>
-    body { margin: 0; background: #000; font-family: 'Georgia', serif; overflow: hidden; color: white; }
+    body { margin: 0; background: #000; font-family: 'Segoe UI', Tahoma, sans-serif; overflow: hidden; color: white; }
     #globeViz { width: 100vw; height: 100vh; }
     
-    /* THE DIALOGUE BOX */
+    /* THE CHARACTER STAND-UP FIGURE */
+    .character-standee {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        cursor: pointer;
+        pointer-events: auto !important;
+        /* Move the anchor to the feet of the image */
+        transform: translate(-50%, -100%);
+        transition: transform 0.2s;
+    }
+    
+    .character-standee:hover {
+        transform: translate(-50%, -105%) scale(1.4);
+    }
+
+    .character-standee img {
+        width: 60px; /* Adjust size here */
+        height: auto;
+        filter: drop-shadow(0 0 10px rgba(255, 204, 0, 0.7));
+    }
+
+    .character-standee .label {
+        background: rgba(0, 0, 0, 0.8);
+        color: #ffcc00;
+        padding: 2px 8px;
+        border-radius: 5px;
+        font-size: 11px;
+        font-weight: bold;
+        margin-top: -5px;
+        border: 1px solid #ffcc00;
+        white-space: nowrap;
+    }
+
+    /* THE POPUP DIALOGUE BOX */
     #info-box {
       position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-      width: 85%; max-width: 550px; max-height: 80vh; overflow-y: auto;
-      background: white; color: #1a1a1a; padding: 40px; border-radius: 20px;
-      display: none; z-index: 10000; box-shadow: 0 0 100px rgba(0,0,0,0.9);
+      width: 85%; max-width: 550px; background: white; border-radius: 20px;
+      display: none; z-index: 10000; padding: 35px;
+      box-shadow: 0 0 100px rgba(0,0,0,0.9); color: #222;
       border-top: 8px solid #b08d57;
     }
     #box-overlay {
@@ -24,10 +58,8 @@
     .back-btn {
       background: #b08d57; color: white; border: none; padding: 12px 24px;
       border-radius: 50px; cursor: pointer; font-weight: bold; margin-bottom: 20px;
-      text-transform: uppercase; letter-spacing: 1px;
+      text-transform: uppercase;
     }
-    h2 { margin: 0; font-size: 2.2rem; }
-    #box-year { color: #b08d57; font-weight: bold; margin-bottom: 10px; text-transform: uppercase; }
   </style>
 </head>
 <body>
@@ -37,56 +69,53 @@
   <div id="box-overlay" onclick="closeBox()"></div>
   <div id="info-box">
     <button class="back-btn" onclick="closeBox()">✕ BACK TO NAVIGATION</button>
-    <div id="box-year"></div>
-    <h2 id="box-title"></h2>
-    <hr style="opacity: 0.2; margin: 20px 0;">
-    <p id="box-desc" style="line-height: 1.8; font-size: 1.1rem; color: #444;"></p>
+    <div id="box-year" style="color:#b08d57; font-weight:bold; margin-bottom:10px;"></div>
+    <h2 id="box-title" style="margin:0; font-size: 2rem;"></h2>
+    <hr style="opacity:0.2; margin:20px 0;">
+    <p id="box-desc" style="line-height:1.8; color:#444; font-size:1.1rem;"></p>
   </div>
 
   <script>
     // --- 1. DATASET ---
-    // Make sure these filenames match your GitHub 'images' folder exactly
+    // The path './images/...' works best for GitHub Pages
     const historyData = [
       { 
         name: "Lord Rama", year: "Date Debated", lat: 26.8, lng: 82.2, 
         img: "./images/rama.png", 
-        desc: "The Seventh Avatar of Lord Vishnu and the King of Ayodhya. Lord Rama's life serves as the ultimate guide to Dharma (righteousness)."
+        desc: "Lord Rama, the seventh avatar of Vishnu, whose journey establishes the concept of Dharma (righteousness). His life is the central theme of the Ramayana."
       },
       { 
-        name: "Alexander the Great", year: "334 BCE", lat: 37.9, lng: 23.7, 
+        name: "Alexander", year: "334 BCE", lat: 37.9, lng: 23.7, 
         img: "./images/alexander.png", 
-        desc: "The Macedonian King who conquered the Persian Empire and established a vast empire reaching the Indus Valley."
+        desc: "King of Macedon who conquered the Persian Empire and established a vast empire reaching the Indus Valley."
       },
       { 
         name: "Adolf Hitler", year: "1939 (WWII)", lat: 52.5, lng: 13.4, 
         img: "./images/hitler.png", 
-        desc: "Leader of Nazi Germany. His invasion of Poland triggered World War II, the deadliest conflict in human history."
+        desc: "Leader of Nazi Germany during World War II, fundamentally altering the course of modern history."
       }
     ];
 
-    // --- 2. GLOBE INITIALIZATION ---
-    // Initialize after the DOM is ready
+    // --- 2. INITIALIZE GLOBE ---
     const world = Globe()
       (document.getElementById('globeViz'))
       .globeImageUrl('https://unpkg.com/three-globe/example/img/earth-night.jpg')
       .backgroundImageUrl('https://unpkg.com/three-globe/example/img/night-sky.png')
       
-      // CUSTOM 3D LAYER FOR CHARACTERS
-      .customLayerData(historyData)
-      .customLayerThreeObject(d => {
-        // Access THREE from the globe.gl internal instance
-        const loader = new THREE.TextureLoader();
-        const texture = loader.load(d.img);
+      // USE HTML ELEMENTS (MUCH MORE STABLE)
+      .htmlElementsData(historyData)
+      .htmlElement(d => {
+        const el = document.createElement('div');
+        el.className = 'character-standee';
+        el.innerHTML = `
+          <img src="${d.img}" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3752/3752311.png'">
+          <div class="label">${d.name}</div>
+        `;
         
-        // Create the 3D Sprite (Billboard)
-        const material = new THREE.SpriteMaterial({ map: texture, transparent: true });
-        const sprite = new THREE.Sprite(material);
-        
-        // Scaling: Change 15 to make them bigger or smaller
-        sprite.scale.set(15, 15, 1); 
-        return sprite;
-      })
-      .onCustomLayerClick(d => showDialogue(d));
+        // Clicks will now work 100%
+        el.onclick = () => showDialogue(d);
+        return el;
+      });
 
     // --- 3. UI FUNCTIONS ---
     function showDialogue(data) {
@@ -104,7 +133,6 @@
       world.controls().autoRotate = true;
     }
 
-    // Auto-spin settings
     world.controls().autoRotate = true;
     world.controls().autoRotateSpeed = 0.5;
   </script>

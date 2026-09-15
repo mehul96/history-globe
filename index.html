@@ -2,12 +2,13 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>HistoryGlobe 3D | Master Edition</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HistoryGlobe 3D | The Human Timeline</title>
   <script src="https://unpkg.com/globe.gl"></script>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Lilita+One&family=Shadows+Into+Light&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Lilita+One&family=Shadows+Into+Light&family=Montserrat:wght@400;700&display=swap');
     
-    body { margin: 0; background: #000; font-family: 'Segoe UI', Tahoma, sans-serif; overflow: hidden; color: white; }
+    body { margin: 0; background: #000; font-family: 'Montserrat', sans-serif; overflow: hidden; color: white; }
     #globeViz { width: 100vw; height: 100vh; background: #000; }
     
     /* CHARACTER STANDEE */
@@ -16,19 +17,19 @@
         cursor: pointer; pointer-events: auto !important;
         transform: translate(-50%, -100%); transition: transform 0.2s;
     }
-    .character-standee:hover { transform: translate(-50%, -105%) scale(1.4); }
-    .character-standee img { width: 60px; height: auto; filter: drop-shadow(0 0 10px rgba(255, 204, 0, 0.7)); }
+    .character-standee:hover { transform: translate(-50%, -105%) scale(1.4); z-index: 100; }
+    .character-standee img { width: 55px; height: auto; filter: drop-shadow(0 0 10px rgba(255, 204, 0, 0.7)); }
     .character-standee .label {
         background: rgba(0, 0, 0, 0.8); color: #ffcc00; padding: 2px 8px;
-        border-radius: 5px; font-size: 11px; font-weight: bold; margin-top: -5px;
+        border-radius: 5px; font-size: 10px; font-weight: bold; margin-top: -5px;
         border: 1px solid #ffcc00; white-space: nowrap;
     }
 
     /* THE DIALOGUE BOX (SCROLLABLE & STICKY) */
     #info-box {
       position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-      width: 90%; max-width: 750px; max-height: 85vh; 
-      overflow-y: auto; background: white; border-radius: 15px;
+      width: 92%; max-width: 800px; max-height: 85vh; 
+      overflow-y: auto; background: white; border-radius: 20px;
       display: none; z-index: 10000; padding: 0;
       box-shadow: 0 0 100px rgba(0,0,0,0.9); color: #222;
       border-top: 10px solid #b08d57;
@@ -37,10 +38,11 @@
 
     .back-btn-container {
       position: sticky; top: 0; background: white; padding: 15px 30px;
-      border-bottom: 1px solid #f0f0f0; z-index: 10001; border-radius: 15px 15px 0 0;
+      border-bottom: 1px solid #f0f0f0; z-index: 10001; border-radius: 20px 20px 0 0;
+      text-align: center;
     }
     .back-btn {
-      background: #b08d57; color: white; border: none; padding: 10px 25px;
+      background: #b08d57; color: white; border: none; padding: 10px 30px;
       border-radius: 50px; cursor: pointer; font-weight: bold; text-transform: uppercase; font-size: 0.8rem;
     }
 
@@ -49,7 +51,6 @@
       background: rgba(0,0,0,0.85); display: none; z-index: 9999;
     }
 
-    /* STICKY LIVE BADGE */
     .live-badge {
         position: fixed; top: 20px; right: 20px;
         background-color: #ff4b4b; color: white; padding: 8px 18px;
@@ -58,10 +59,16 @@
     }
 
     /* TEXT FORMATTING */
-    h2 { font-family: 'Lilita One', cursive; font-size: 2.5rem; margin: 0; color: #1a1a1a; line-height: 1.1; }
+    h2 { font-family: 'Lilita One', cursive; font-size: 2.8rem; margin: 0; color: #1a1a1a; line-height: 1.1; }
     .sub-head { color: #b08d57; font-weight: bold; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 10px; }
-    .desc-section { line-height: 1.8; color: #444; font-size: 1.1rem; }
-    .desc-section b { color: #000; display: block; margin-top: 25px; font-size: 1.3rem; }
+    .desc-section { line-height: 1.8; color: #444; font-size: 1.15rem; }
+    .desc-section b { color: #000; display: block; margin-top: 30px; font-size: 1.4rem; border-bottom: 2px solid #f0f0f0; padding-bottom: 5px; }
+    
+    /* Mobile Section Stacking */
+    @media (max-width: 768px) {
+        h2 { font-size: 2rem; }
+        #info-content { padding: 25px; }
+    }
   </style>
 </head>
 <body>
@@ -85,174 +92,232 @@
   <script>
     const historyData = [
       { 
-        name: "Soviet-Afghan War", 
-        year: "1979 - 1989", 
-        lat: 33.9, lng: 67.7, 
-        img: "./images/afghan.png", 
-        desc: `
-          <b>Chapter 1: The Soviet Invasion of Afghanistan</b>
-          A nine-year conflict fueled by the Cold War. In Dec 1979, the Soviet Union intervened to support the communist PDPA government against rising internal rebellions.
-          <br><br>
-          <b>1.1 Background and Saur Revolution</b>
-          The conflict originated from the Saur Revolution of April 1978. The new communist regime faced resistance as their radical reforms clashed with traditional rural values.
-          <br><br>
-          <b>1.2 Global Geopolitics</b>
-          The US, Saudi Arabia, and Pakistan funneled billions to the 'Mujahedeen' (Islamic guerilla fighters). The introduction of US Stinger missiles in 1986 neutralized Soviet air superiority, turning the tide.
-          <br><br>
-          <b>1.3 Withdrawal and Collapse</b>
-          Mikhail Gorbachev initiated withdrawal in 1988. The war crippled the Soviet economy and contributed significantly to the eventual collapse of the USSR.
-        `
+        name: "Lord Rama", year: "Date Debated", lat: 26.8, lng: 82.2, img: "./images/rama.png",
+        desc: `<b>The Story of Dharma</b>Revered as the seventh avatar of Lord Vishnu, Rama is the central figure of the Ramayana. 
+        His life serves as a model of righteous conduct, duty, and leadership. After a 14-year exile, his victory over Ravana 
+        symbolizes the triumph of light over darkness, celebrated globally as Diwali.`
       },
       { 
-        name: "Fall of Berlin Wall", 
-        year: "Nov 9, 1989", 
-        lat: 52.5, lng: 13.4, 
-        img: "./images/berlin.png", 
-        desc: `
-          <b>Chapter 2: The Fall of the Berlin Wall</b>
-          The most powerful symbol of the Cold War fell on Nov 9, 1989, signaling the end of the Iron Curtain.
-          <br><br>
-          <b>2.1 The Catalyst of Change</b>
-          Mikhail Gorbachev's 'Sinatra Doctrine' signaled that the USSR would no longer use force to prop up hardline communist regimes in Eastern Europe.
-          <br><br>
-          <b>2.2 The Night of Nov 9</b>
-          A bureaucratic mistake by East German official Günter Schabowski led to a premature announcement that travel restrictions were lifted. Thousands rushed the gates, and the guards, overwhelmed and without orders, opened the borders.
-        `
+        name: "Alexander the Great", year: "356-323 BCE", lat: 40.7, lng: 22.5, img: "./images/alexander.png",
+        desc: `<b>World Conqueror</b>By age 30, Alexander created one of the largest empires in history, stretching from 
+        Greece to Egypt and NW India. He remained undefeated in battle and is considered one of the greatest military 
+        commanders to ever live, initiating the Hellenistic Age.`
       },
       { 
-        name: "Vietnam War", 
-        year: "1955 - 1975", 
-        lat: 14.0, lng: 108.0, 
-        img: "./images/vietnam.png", 
-        desc: `
-          <b>The Vietnam War: A Cold War Flashpoint</b>
-          A conflict between North Vietnam (supported by USSR/China) and South Vietnam (supported by the USA).
-          <br><br>
-          <b>Escalation</b>
-          What began as a colonial struggle against France escalated into a massive US military intervention to 'contain' communism. 
-          <br><br>
-          <b>3.3 The Fall of Saigon</b>
-          In April 1975, North Vietnamese tanks crashed through the gates of the Presidential Palace, reunifying the country and marking a significant shift in Asian geopolitics.
-        `
+        name: "Soviet-Afghan War", year: "1979-1989", lat: 33.9, lng: 67.7, img: "./images/afghan.png",
+        desc: `<b>1.1 Background and the Saur Revolution</b>The conflict originated from the Saur Revolution of April 1978. 
+        The new communist regime faced resistance as their radical reforms clashed with traditional rural values.<br><br>
+        <b>1.2 Global Geopolitics</b>The US and Saudi Arabia funneled billions to the 'Mujahedeen' fighters. 
+        Stinger missiles neutralized Soviet air superiority, turning the tide of the war.`
       },
       { 
-        name: "Bangladesh War", 
-        year: "1971", 
-        lat: 23.8, lng: 90.4, 
-        img: "./images/bangladesh.png", 
-        desc: `
-          <b>The Bangladesh Liberation War</b>
-          A revolution and armed conflict sparked by the rise of Bengali nationalism in East Pakistan.
-          <br><br>
-          <b>Operation Searchlight</b>
-          In March 1971, the Pakistani military launched a crackdown, leading to massive human rights violations and millions of refugees fleeing to India.
-          <br><br>
-          <b>Indian Intervention</b>
-          India joined the war in Dec 1971, leading to the surrender of 93,000 Pakistani soldiers and the creation of the independent nation of Bangladesh.
-        `
+        name: "Fall of Berlin Wall", year: "1989", lat: 52.5, lng: 13.4, img: "./images/berlin.png",
+        desc: `<b>Chapter 2: The Fall of the Berlin Wall</b>The most powerful symbol of the Cold War fell on Nov 9, 1989. 
+        A bureaucratic mistake during a press conference led to thousands of East Germans rushing the checkpoints, 
+        ending decades of separation and signaling the end of the Soviet Empire in Europe.`
       },
       { 
-        name: "Civil Rights Movement", 
-        year: "1954 - 1968", 
-        lat: 38.9, lng: -77.0, 
-        img: "./images/civilrights.png", 
-        desc: `
-          <b>The Fight for Equality in the USA</b>
-          A decades-long struggle to abolish institutional racial segregation and discrimination.
-          <br><br>
-          <b>Key Legislation</b>
-          The Civil Rights Act of 1964 and the Voting Rights Act of 1965 dismantled 'Jim Crow' laws and enfranchised millions of Black Americans.
-          <br><br>
-          <b>Leadership</b>
-          Led by figures like Dr. Martin Luther King Jr., the movement used non-violent civil disobedience to reshape American society.
-        `
+        name: "Vietnam War", year: "1955-1975", lat: 14.0, lng: 108.2, img: "./images/vietnam.png",
+        desc: `<b>The Fall of Saigon</b>In 1975, North Vietnamese forces launched a massive final offensive, 
+        sweeping southward. The chaotic evacuation of American personnel from the embassy roof symbolized the 
+        end of the conflict and the reunification of Vietnam under communist rule.`
       },
       { 
-        name: "Cuban Missile Crisis", 
-        year: "Oct 1962", 
-        lat: 23.1, lng: -82.3, 
-        img: "./images/cuba.png", 
-        desc: `
-          <b>13 Days on the Brink of Nuclear War</b>
-          The closest the world ever came to full-scale nuclear conflict.
-          <br><br>
-          <b>The Stand-off</b>
-          The US discovered Soviet nuclear missiles in Cuba. President Kennedy ordered a 'quarantine' around the island. 
-          <br><br>
-          <b>Resolution</b>
-          Khrushchev agreed to remove the missiles in exchange for a US pledge not to invade Cuba and a secret agreement to remove US missiles from Turkey.
-        `
+        name: "Bangladesh Liberation", year: "1971", lat: 23.8, lng: 90.4, img: "./images/bangladesh.png",
+        desc: `<b>South Asian Liberation</b>Sparked by the rise of Bengali nationalism, the war saw extreme 
+        political tension lead to a military crackdown. Indian intervention in Dec 1971 led to the surrender 
+        of 93,000 Pakistani soldiers and the birth of Bangladesh.`
       },
       { 
-        name: "Moon Landing", 
-        year: "July 20, 1969", 
-        lat: 28.5, lng: -80.6, 
-        img: "./images/moon.png", 
-        desc: `
-          <b>One Giant Leap for Mankind</b>
-          Apollo 11 became the first crewed mission to land on the Moon.
-          <br><br>
-          <b>The Race to Space</b>
-          The mission fulfilled President Kennedy's 1961 goal and marked a supreme technological achievement for humanity.
-          <br><br>
-          <b>Impact</b>
-          Neil Armstrong and Buzz Aldrin spent two hours on the lunar surface, collecting 47 lbs of lunar material.
-        `
+        name: "Civil Rights Movement", year: "1954-1968", lat: 38.9, lng: -77.0, img: "./images/civilrights.png",
+        desc: `<b>1.1 Legislative Milestones</b>The Civil Rights Act of 1964 and Voting Rights Act of 1965 
+        dismantled segregation and institutional racism in the USA. Figures like Dr. Martin Luther King Jr. 
+        used non-violent civil disobedience to reshape global human rights.`
       },
       { 
-        name: "Assassination of Ferdinand", 
-        year: "June 28, 1914", 
-        lat: 43.8, lng: 18.4, 
-        img: "./images/sarajevo.png", 
-        desc: `
-          <b>The Spark that Ignited World War I</b>
-          Archduke Franz Ferdinand of Austria was assassinated in Sarajevo by Gavrilo Princip.
-          <br><br>
-          <b>The Domino Effect</b>
-          This event triggered a series of alliances that brought the global powers into a catastrophic conflict that lasted four years.
-        `
+        name: "Cuban Missile Crisis", year: "1962", lat: 23.1, lng: -82.3, img: "./images/cuba.png",
+        desc: `<b>The Brink of Nuclear War</b>The closest the world came to full-scale nuclear conflict. 
+        A 13-day standoff between the US and USSR followed the discovery of Soviet missiles in Cuba, 
+        resulting in a secret agreement to remove missiles from both Cuba and Turkey.`
+      },
+      { 
+        name: "Moon Landing", year: "1969", lat: 28.5, lng: -80.6, img: "./images/moon.png",
+        desc: `<b>One Giant Leap</b>On July 20, 1969, Neil Armstrong and Buzz Aldrin became the first 
+        humans to land on the Moon. Broadcast to 650 million people, it marked the ultimate achievement 
+        of the Space Race and human technology.`
+      },
+      { 
+        name: "Korean War", year: "1950-1953", lat: 37.5, lng: 127.0, img: "./images/korea.png",
+        desc: `<b>The Forgotten War</b>The first major military proxy conflict of the Cold War. 
+        It ended in a stalemate and the creation of the Korean Demilitarized Zone (DMZ), 
+        leaving the peninsula divided to this day.`
+      },
+      { 
+        name: "Cuban Revolution", year: "1953-1959", lat: 20.0, lng: -75.0, img: "./images/cuba.png",
+        desc: `<b>Fidel Castro & Che Guevara</b>An armed revolt that overthrew the US-backed dictator 
+        Fulgencio Batista. The revolution transformed Cuba into a socialist state and a key 
+        ally of the Soviet Union in the Western Hemisphere.`
+      },
+      { 
+        name: "Russian Revolution", year: "1905", lat: 59.9, lng: 30.3, img: "./images/russia1917.png",
+        desc: `<b>The 1905 Uprising</b>A wave of mass political and social unrest that spread 
+        through vast areas of the Russian Empire, directed against the Tsar. It set the 
+        stage for the later 1917 revolutions.`
+      },
+      { 
+        name: "Assassination of Ferdinand", year: "1914", lat: 43.8, lng: 18.4, img: "./images/sarajevo.png",
+        desc: `<b>The Spark of WWI</b>Archduke Franz Ferdinand of Austria was assassinated in 
+        Sarajevo by Gavrilo Princip. This triggered a chain reaction of alliances that 
+        plunged the world into the first truly global war.`
+      },
+      { 
+        name: "World War I", year: "1914-1918", lat: 50.0, lng: 5.0, img: "./images/ww1.png",
+        desc: `<b>The Great War</b>A global conflict that reordered the world map, led to 
+        the collapse of four empires, and introduced industrialized warfare on a 
+        scale never before seen.`
+      },
+      { 
+        name: "Holocaust", year: "1941-1945", lat: 50.0, lng: 19.0, img: "./images/holocaust.png",
+        desc: `<b>Systematic Genocide</b>The state-sponsored persecution and murder of six 
+        million Jews by the Nazi regime. It remains the most horrific example of 
+        humanity's capacity for evil.`
+      },
+      { 
+        name: "Pearl Harbor", year: "Dec 7, 1941", lat: 21.3, lng: -157.9, img: "./images/pearlharbor.png",
+        desc: `<b>A Day of Infamy</b>A surprise military strike by the Imperial Japanese Navy 
+        against the US naval base at Pearl Harbor, Hawaii. This event directly 
+        brought the United States into World War II.`
+      },
+      { 
+        name: "D-Day", year: "June 6, 1944", lat: 49.3, lng: -0.8, img: "./images/dday.png",
+        desc: `<b>Invasion of Normandy</b>The Allied landings on the beaches of France. 
+        It was the largest seaborne invasion in history and marked the beginning 
+        of the end for Nazi Germany in Western Europe.`
+      },
+      { 
+        name: "Hiroshima & Nagasaki", year: "Aug 1945", lat: 34.4, lng: 132.4, img: "./images/hiroshima.png",
+        desc: `<b>The Atomic Age</b>The US dropped two atomic bombs on Japan, leading to 
+        immediate surrender. This event changed global warfare forever and started 
+        the nuclear arms race.`
+      },
+      { 
+        name: "United Nations Founded", year: "1945", lat: 40.7, lng: -73.9, img: "./images/un.png",
+        desc: `<b>Global Peacekeeping</b>Founded after WWII to prevent future global 
+        conflicts. 51 countries committed to maintaining international peace 
+        and security.`
+      },
+      { 
+        name: "Indian Independence", year: "1947", lat: 28.6, lng: 77.2, img: "./images/india.png",
+        desc: `<b>End of British Raj</b>The birth of the independent nations of India 
+        and Pakistan. It triggered the largest mass migration in human history 
+        and fundamentally changed South Asian history.`
+      },
+      { 
+        name: "Creation of Israel", year: "1948", lat: 31.0, lng: 34.8, img: "./images/israel.png",
+        desc: `<b>Statehood & Conflict</b>The formal establishment of the State of 
+        Israel following the end of the British Mandate. It sparked the first 
+        Arab-Israeli War and decades of regional tension.`
+      },
+      { 
+        name: "Chinese Revolution", year: "1949", lat: 39.9, lng: 116.4, img: "./images/china.png",
+        desc: `<b>Communist Victory</b>Mao Zedong declared the People's Republic of 
+        China after the defeat of Nationalist forces, beginning a new era 
+        of communist rule in Asia.`
+      },
+      { 
+        name: "NATO Founded", year: "1949", lat: 50.8, lng: 4.4, img: "./images/nato.png",
+        desc: `<b>Cold War Alliance</b>The North Atlantic Treaty Organization was 
+        formed by Western nations as a mutual defense pact against Soviet 
+        expansion in Europe.`
+      },
+      { 
+        name: "Adolf Hitler", year: "1933", lat: 52.5, lng: 13.4, img: "./images/hitler.png",
+        desc: `<b>Rise of Nazi Germany</b>The appointment of Hitler as Chancellor 
+        led to the rapid dismantling of German democracy and the start of 
+        a totalitarian dictatorship.`
+      },
+      { 
+        name: "Spanish Civil War", year: "1936-1939", lat: 40.4, lng: -3.7, img: "./images/spain.png",
+        desc: `<b>Dress Rehearsal for WWII</b>A brutal conflict between Republicans 
+        and Nationalists. It became a global proxy battleground for 
+        fascist and communist ideologies.`
+      },
+      { 
+        name: "Treaty of Versailles", year: "1919", lat: 48.8, lng: 2.1, img: "./images/versailles.png",
+        desc: `<b>The Peace of the Victors</b>The formal end of WWI. The harsh 
+        reparations imposed on Germany are widely cited as a major 
+        cause of the eventual rise of WWII.`
+      },
+      { 
+        name: "Agricultural Revolution", year: "10,000 BCE", lat: 33.0, lng: 44.0, img: "./images/agri.png",
+        desc: `<b>Dawn of Humanity</b>The transition from hunting/gathering to 
+        farming. It allowed for permanent settlements and the birth 
+        of all subsequent human civilizations.`
+      },
+      { 
+        name: "Indus Valley", year: "3300 BCE", lat: 27.2, lng: 68.8, img: "./images/indus.png",
+        desc: `<b>Ancient Urbanism</b>One of the world's earliest urban civilizations. 
+        They built advanced cities with drainage systems and 
+        standardized weights and measures.`
+      },
+      { 
+        name: "Sumerian Civilization", year: "3500 BCE", lat: 31.0, lng: 46.0, img: "./images/sumer.png",
+        desc: `<b>The First Writing</b>Mesopotamian civilization that gave us 
+        Cuneiform, the wheel, and the first recorded laws in 
+        human history.`
+      },
+      { 
+        name: "Alexander's Conquests", year: "334 BCE", lat: 37.9, lng: 23.7, img: "./images/alexander.png",
+        desc: `<b>Merging East and West</b>Alexander the Great's journey from 
+        Greece to India changed the cultural fabric of three 
+        continents forever.`
+      },
+      { 
+        name: "Mahabharata", year: "Date Debated", lat: 29.9, lng: 76.8, img: "./images/bharat.png",
+        desc: `<b>The Great War</b>Ancient India's monumental epic detailing 
+        the battle of Kurukshetra. It remains one of the world's 
+        longest and most profound literary works.`
       }
     ];
 
     try {
-        const world = Globe()
-          (document.getElementById('globeViz'))
-          .globeImageUrl('https://unpkg.com/three-globe/example/img/earth-night.jpg')
-          .backgroundImageUrl('https://unpkg.com/three-globe/example/img/night-sky.png')
-          .htmlElementsData(historyData)
-          .htmlElement(d => {
-            const el = document.createElement('div');
-            el.className = 'character-standee';
-            el.innerHTML = `
-              <img src="${d.img}" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3752/3752311.png'">
-              <div class="label">${d.name}</div>
-            `;
-            el.onclick = () => showDialogue(d);
-            return el;
-          });
+      const world = Globe()
+        (document.getElementById('globeViz'))
+        .globeImageUrl('https://unpkg.com/three-globe/example/img/earth-night.jpg')
+        .backgroundImageUrl('https://unpkg.com/three-globe/example/img/night-sky.png')
+        .htmlElementsData(historyData)
+        .htmlElement(d => {
+          const el = document.createElement('div');
+          el.className = 'character-standee';
+          el.innerHTML = `
+            <img src="${d.img}" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3752/3752311.png'">
+            <div class="label">${d.name}</div>
+          `;
+          el.onclick = () => showDialogue(d);
+          return el;
+        });
 
-        function showDialogue(data) {
-          document.getElementById('box-title').innerText = data.name;
-          document.getElementById('box-year').innerText = "TIMELINE: " + data.year;
-          document.getElementById('box-desc').innerHTML = data.desc;
-          
-          document.getElementById('box-overlay').style.display = 'block';
-          const infoBox = document.getElementById('info-box');
-          infoBox.style.display = 'block';
-          infoBox.scrollTop = 0;
-          world.controls().autoRotate = false;
-        }
+      function showDialogue(data) {
+        document.getElementById('box-title').innerText = data.name;
+        document.getElementById('box-year').innerText = "Timeline: " + data.year;
+        document.getElementById('box-desc').innerHTML = data.desc;
+        document.getElementById('box-overlay').style.display = 'block';
+        const box = document.getElementById('info-box');
+        box.style.display = 'block';
+        box.scrollTop = 0;
+        world.controls().autoRotate = false;
+      }
 
-        function closeBox() {
-          document.getElementById('box-overlay').style.display = 'none';
-          document.getElementById('info-box').style.display = 'none';
-          world.controls().autoRotate = true;
-        }
-
+      function closeBox() {
+        document.getElementById('box-overlay').style.display = 'none';
+        document.getElementById('info-box').style.display = 'none';
         world.controls().autoRotate = true;
-        world.controls().autoRotateSpeed = 0.5;
-    } catch (err) {
-        document.body.innerHTML = "<h2 style='padding:20px; color:black;'>Globe failed. Reason: " + err.message + "</h2>";
+      }
+
+      world.controls().autoRotate = true;
+      world.controls().autoRotateSpeed = 0.5;
+    } catch (e) {
+      document.body.innerHTML = `<h2 style='color:black; padding:20px'>Error: ${e.message}</h2>`;
     }
   </script>
 </body>

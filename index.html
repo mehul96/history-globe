@@ -8,7 +8,7 @@
     @import url('https://fonts.googleapis.com/css2?family=Lilita+One&family=Shadows+Into+Light&display=swap');
     
     body { margin: 0; background: #000; font-family: 'Segoe UI', Tahoma, sans-serif; overflow: hidden; color: white; }
-    #globeViz { width: 100vw; height: 100vh; }
+    #globeViz { width: 100vw; height: 100vh; background: #000; }
     
     /* THE CHARACTER STAND-UP FIGURE */
     .character-standee {
@@ -28,7 +28,7 @@
         border: 1px solid #ffcc00; white-space: nowrap;
     }
 
-    /* THE DIALOGUE BOX (NOW SCROLLABLE) */
+    /* THE DIALOGUE BOX */
     #info-box {
       position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
       width: 90%; max-width: 700px; max-height: 85vh; 
@@ -39,7 +39,6 @@
     }
     #info-content { padding: 30px; }
 
-    /* STICKY BACK BUTTON */
     .back-btn-container {
       position: sticky; top: 0; background: white; padding: 15px 30px;
       border-bottom: 1px solid #f0f0f0; z-index: 10001; border-radius: 15px 15px 0 0;
@@ -54,7 +53,6 @@
       background: rgba(0,0,0,0.85); display: none; z-index: 9999;
     }
     
-    /* Formatting within the description */
     #box-desc b { color: black; display: block; margin-top: 15px; }
   </style>
 </head>
@@ -64,7 +62,6 @@
 
   <div id="box-overlay" onclick="closeBox()"></div>
   
-  <!-- THE DIALOGUE BOX STRUCTURE -->
   <div id="info-box">
     <div class="back-btn-container">
         <button class="back-btn" onclick="closeBox()">✕ BACK TO NAVIGATION</button>
@@ -78,140 +75,106 @@
   </div>
 
   <script>
+    // --- VERIFIED DATASET (Check every comma) ---
     const historyData = [
       { 
         name: "Lord Rama", 
         year: "Date Debated", 
         lat: 26.8, lng: 82.2, 
         img: "./images/rama.png", 
-        desc: `
-          <b style="font-size:1.4rem; margin-bottom:10px;">Lord Rama and the Ramayana: The Story of Dharma, Duty, and Ideal Leadership</b>
-          Unlike figures such as Alexander or Hitler, Lord Rama is primarily a revered religious and literary figure. In Hindu tradition, Rama is worshipped as the seventh avatar of Lord Vishnu.<br><br>
-          <b>The Birth of Rama</b>
-          The story begins in Ayodhya. After a sacred ritual, King Dasharatha's queens gave birth to four sons: Rama, Bharata, Lakshmana, and Shatrughna.<br><br>
-          <b>The Great War and Rama Rajya</b>
-          Rama defeated Ravana in a massive battle, rescuing Sita. He returned to Ayodhya to establish 'Rama Rajya'—the ideal kingdom of justice, peace, and prosperity.
-        `
+        desc: "<b>Lord Rama and the Ramayana</b><br>Revered as the seventh avatar of Vishnu and a symbol of righteousness. His journey from Ayodhya to establish 'Ram Rajya' is a cornerstone of global literature."
       },
       { 
         name: "Alexander the Great", 
         year: "334 - 323 BCE", 
         lat: 37.9, lng: 23.7, 
         img: "./images/alexander.png", 
-        desc: `
-          <b style="font-size:1.4rem; margin-bottom:10px;">Alexander the Great: The Rise and Legacy of a World Conqueror</b>
-          By the age of 30, Alexander had built an empire stretching from Greece and Egypt to modern-day India.<br><br>
-          <b>Becoming King</b>
-          At age 20, after his father Philip II was assassinated, Alexander claimed the throne and crushed all rebellions to secure his power.<br><br>
-          <b>Death and Legacy</b>
-          He died at age 32 in Babylon. He never lost a battle and his campaigns spread Greek culture across three continents.
-        `
+        desc: "<b>World Conqueror</b><br>Alexander built an empire from Greece to India by age 30, spreading Greek culture (Hellenism) across three continents."
       },
       { 
         name: "Adolf Hitler", 
         year: "1933 - 1945", 
         lat: 52.5, lng: 13.4, 
         img: "./images/hitler.png", 
-        desc: `
-          <b style="font-size:1.4rem; margin-bottom:10px;">Adolf Hitler: The Rise, Rule, and Fall of Nazi Germany</b>
-          Hitler was the leader of Nazi Germany whose expansionist policies triggered World War II and the Holocaust.<br><br>
-          <b>World War II and the Holocaust</b>
-          Germany invaded Poland in 1939, starting WWII. Under his regime, the Holocaust systematically murdered approximately six million Jews.
-        `
-      }, // Added missing comma here
+        desc: "<b>WWII and the Holocaust</b><br>Leader of Nazi Germany whose expansionist policies led to the deadliest conflict in human history and the genocide of six million Jews."
+      },
       { 
         name: "Gulf War", 
         year: "1990 - 1991", 
         lat: 29.3, lng: 47.9, 
         img: "./images/gulfwar.png", 
-        desc: `
-          <b style="font-size:1.4rem; margin-bottom:10px;">The Gulf War: Operation Desert Storm</b>
-          Triggered by Iraq's invasion of Kuwait in August 1990, this conflict saw a US-led coalition of 35 nations stand against Saddam Hussein's forces.<br><br>
-          <b>1.2 The Invasion and International Response</b>
-          Iraq invaded on August 2, 1990. The UN passed Resolution 660, demanding immediate withdrawal. By January 1991, the coalition launched a massive air campaign.
-        `
+        desc: "<b>Operation Desert Storm</b><br>A US-led coalition liberated Kuwait following Iraq's invasion ordered by Saddam Hussein."
       },
       { 
         name: "Collapse of USSR", 
         year: "1991", 
         lat: 55.7, lng: 37.6, 
         img: "./images/ussr.png", 
-        desc: `
-          <b style="font-size:1.4rem; margin-bottom:10px;">The Dissolution of the Soviet Union</b>
-          On December 26, 1991, the Soviet Union—once a global superpower—formally ceased to exist, marking the end of the Cold War.<br><br>
-          <b>2.1 Structural Decay and Reform</b>
-          Mikhail Gorbachev introduced two radical policies: Glasnost (Openness) and Perestroika (Restructuring).
-        `
+        desc: "<b>End of the Cold War</b><br>The dissolution of the Soviet Union marked the end of the bipolar world and the rise of 15 independent nations."
       },
       { 
         name: "9/11 Attacks", 
         year: "2001", 
         lat: 40.7, lng: -74.0, 
         img: "./images/sept11.png", 
-        desc: `
-          <b style="font-size:1.4rem; margin-bottom:10px;">September 11: The Day That Changed the World</b>
-          Coordinated terrorist attacks by Al-Qaeda on the United States, resulting in nearly 3,000 deaths and the start of the "War on Terror."
-        `
+        desc: "<b>The Day that Changed Everything</b><br>Terrorist attacks in NYC and Washington D.C. that triggered the global War on Terror."
       },
       { 
         name: "Arab Spring", 
         year: "2010 - 2012", 
         lat: 33.8, lng: 9.5, 
         img: "./images/arabspring.png", 
-        desc: `
-          <b style="font-size:1.4rem; margin-bottom:10px;">The Arab Spring: Revolution in the Middle East</b>
-          A series of anti-government protests, uprisings, and armed rebellions that spread across much of the Arab world starting in Tunisia.
-        `
+        desc: "<b>Middle East Revolutions</b><br>Pro-democracy uprisings that swept across Tunisia, Egypt, Libya, and Syria."
       },
       { 
         name: "Invasion of Ukraine", 
         year: "2022 - Present", 
         lat: 50.4, lng: 30.5, 
         img: "./images/ukraine.png", 
-        desc: `
-          <b style="font-size:1.4rem; margin-bottom:10px;">Full-Scale Invasion of Ukraine</b>
-          On February 24, 2022, Russia launched a massive military invasion of Ukraine, escalating the conflict that began in 2014.
-      `
+        desc: "<b>Modern Conflict in Europe</b><br>Russia's full-scale military invasion of Ukraine, escalating a conflict that began in 2014."
       }
     ];
 
-    const world = Globe()
-      (document.getElementById('globeViz'))
-      .globeImageUrl('https://unpkg.com/three-globe/example/img/earth-night.jpg')
-      .backgroundImageUrl('https://unpkg.com/three-globe/example/img/night-sky.png')
-      .htmlElementsData(historyData)
-      .htmlElement(d => {
-        const el = document.createElement('div');
-        el.className = 'character-standee';
-        el.innerHTML = `
-          <img src="${d.img}" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3752/3752311.png'">
-          <div class="label">${d.name}</div>
-        `;
-        el.onclick = () => showDialogue(d);
-        return el;
-      });
+    try {
+        const world = Globe()
+          (document.getElementById('globeViz'))
+          .globeImageUrl('https://unpkg.com/three-globe/example/img/earth-night.jpg')
+          .backgroundImageUrl('https://unpkg.com/three-globe/example/img/night-sky.png')
+          .htmlElementsData(historyData)
+          .htmlElement(d => {
+            const el = document.createElement('div');
+            el.className = 'character-standee';
+            el.innerHTML = `
+              <img src="${d.img}" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3752/3752311.png'">
+              <div class="label">${d.name}</div>
+            `;
+            el.onclick = () => showDialogue(d);
+            return el;
+          });
 
-    function showDialogue(data) {
-      document.getElementById('box-title').innerText = data.name;
-      document.getElementById('box-year').innerText = "Timeline: " + data.year;
-      document.getElementById('box-desc').innerHTML = data.desc;
-      
-      document.getElementById('box-overlay').style.display = 'block';
-      const infoBox = document.getElementById('info-box');
-      infoBox.style.display = 'block';
-      infoBox.scrollTop = 0; // Reset scroll to top
-      
-      world.controls().autoRotate = false;
+        function showDialogue(data) {
+          document.getElementById('box-title').innerText = data.name;
+          document.getElementById('box-year').innerText = "Timeline: " + data.year;
+          document.getElementById('box-desc').innerHTML = data.desc;
+          
+          document.getElementById('box-overlay').style.display = 'block';
+          const infoBox = document.getElementById('info-box');
+          infoBox.style.display = 'block';
+          infoBox.scrollTop = 0;
+          world.controls().autoRotate = false;
+        }
+
+        function closeBox() {
+          document.getElementById('box-overlay').style.display = 'none';
+          document.getElementById('info-box').style.display = 'none';
+          world.controls().autoRotate = true;
+        }
+
+        world.controls().autoRotate = true;
+        world.controls().autoRotateSpeed = 0.5;
+    } catch (err) {
+        document.body.innerHTML = "<h2 style='padding:20px'>Globe failed to load. Reason: " + err.message + "</h2>";
     }
-
-    function closeBox() {
-      document.getElementById('box-overlay').style.display = 'none';
-      document.getElementById('info-box').style.display = 'none';
-      world.controls().autoRotate = true;
-    }
-
-    world.controls().autoRotate = true;
-    world.controls().autoRotateSpeed = 0.5;
   </script>
 </body>
 </html>

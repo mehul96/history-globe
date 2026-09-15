@@ -10,15 +10,11 @@
     body { margin: 0; background: #000; font-family: 'Segoe UI', Tahoma, sans-serif; overflow: hidden; color: white; }
     #globeViz { width: 100vw; height: 100vh; background: #000; }
     
-    /* THE CHARACTER STAND-UP FIGURE */
+    /* CHARACTER STANDEE */
     .character-standee {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        cursor: pointer;
-        pointer-events: auto !important;
-        transform: translate(-50%, -100%);
-        transition: transform 0.2s;
+        display: flex; flex-direction: column; align-items: center;
+        cursor: pointer; pointer-events: auto !important;
+        transform: translate(-50%, -100%); transition: transform 0.2s;
     }
     .character-standee:hover { transform: translate(-50%, -105%) scale(1.4); }
     .character-standee img { width: 60px; height: auto; filter: drop-shadow(0 0 10px rgba(255, 204, 0, 0.7)); }
@@ -28,23 +24,23 @@
         border: 1px solid #ffcc00; white-space: nowrap;
     }
 
-    /* THE DIALOGUE BOX */
+    /* THE DIALOGUE BOX (SCROLLABLE & STICKY) */
     #info-box {
       position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-      width: 90%; max-width: 700px; max-height: 85vh; 
+      width: 90%; max-width: 750px; max-height: 85vh; 
       overflow-y: auto; background: white; border-radius: 15px;
       display: none; z-index: 10000; padding: 0;
       box-shadow: 0 0 100px rgba(0,0,0,0.9); color: #222;
-      border-top: 8px solid #b08d57;
+      border-top: 10px solid #b08d57;
     }
-    #info-content { padding: 30px; }
+    #info-content { padding: 40px; }
 
     .back-btn-container {
       position: sticky; top: 0; background: white; padding: 15px 30px;
       border-bottom: 1px solid #f0f0f0; z-index: 10001; border-radius: 15px 15px 0 0;
     }
     .back-btn {
-      background: #b08d57; color: white; border: none; padding: 10px 20px;
+      background: #b08d57; color: white; border: none; padding: 10px 25px;
       border-radius: 50px; cursor: pointer; font-weight: bold; text-transform: uppercase; font-size: 0.8rem;
     }
 
@@ -52,14 +48,26 @@
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
       background: rgba(0,0,0,0.85); display: none; z-index: 9999;
     }
-    
-    #box-desc b { color: black; display: block; margin-top: 15px; }
+
+    /* STICKY LIVE BADGE */
+    .live-badge {
+        position: fixed; top: 20px; right: 20px;
+        background-color: #ff4b4b; color: white; padding: 8px 18px;
+        border-radius: 30px; font-weight: bold; font-size: 11px;
+        z-index: 99999; box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    }
+
+    /* TEXT FORMATTING */
+    h2 { font-family: 'Lilita One', cursive; font-size: 2.5rem; margin: 0; color: #1a1a1a; line-height: 1.1; }
+    .sub-head { color: #b08d57; font-weight: bold; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 10px; }
+    .desc-section { line-height: 1.8; color: #444; font-size: 1.1rem; }
+    .desc-section b { color: #000; display: block; margin-top: 25px; font-size: 1.3rem; }
   </style>
 </head>
 <body>
 
+  <div class="live-badge">🟢 1 Person Navigating Now</div>
   <div id="globeViz"></div>
-
   <div id="box-overlay" onclick="closeBox()"></div>
   
   <div id="info-box">
@@ -67,71 +75,142 @@
         <button class="back-btn" onclick="closeBox()">✕ BACK TO NAVIGATION</button>
     </div>
     <div id="info-content">
-        <div id="box-year" style="color:#b08d57; font-weight:bold; margin-bottom:10px; text-transform: uppercase; letter-spacing: 2px;"></div>
-        <h2 id="box-title" style="margin:0; font-size: 2.2rem; font-family: serif;"></h2>
-        <hr style="opacity:0.2; margin: 20px 0;">
-        <div id="box-desc" style="line-height:1.8; color:#444; font-size:1.1rem;"></div>
+        <div id="box-year" class="sub-head"></div>
+        <h2 id="box-title"></h2>
+        <hr style="opacity: 0.1; margin: 25px 0;">
+        <div id="box-desc" class="desc-section"></div>
     </div>
   </div>
 
   <script>
-    // --- VERIFIED DATASET (Check every comma) ---
     const historyData = [
       { 
-        name: "Lord Rama", 
-        year: "Date Debated", 
-        lat: 26.8, lng: 82.2, 
-        img: "./images/rama.png", 
-        desc: "<b>Lord Rama and the Ramayana</b><br>Revered as the seventh avatar of Vishnu and a symbol of righteousness. His journey from Ayodhya to establish 'Ram Rajya' is a cornerstone of global literature."
+        name: "Soviet-Afghan War", 
+        year: "1979 - 1989", 
+        lat: 33.9, lng: 67.7, 
+        img: "./images/afghan.png", 
+        desc: `
+          <b>Chapter 1: The Soviet Invasion of Afghanistan</b>
+          A nine-year conflict fueled by the Cold War. In Dec 1979, the Soviet Union intervened to support the communist PDPA government against rising internal rebellions.
+          <br><br>
+          <b>1.1 Background and Saur Revolution</b>
+          The conflict originated from the Saur Revolution of April 1978. The new communist regime faced resistance as their radical reforms clashed with traditional rural values.
+          <br><br>
+          <b>1.2 Global Geopolitics</b>
+          The US, Saudi Arabia, and Pakistan funneled billions to the 'Mujahedeen' (Islamic guerilla fighters). The introduction of US Stinger missiles in 1986 neutralized Soviet air superiority, turning the tide.
+          <br><br>
+          <b>1.3 Withdrawal and Collapse</b>
+          Mikhail Gorbachev initiated withdrawal in 1988. The war crippled the Soviet economy and contributed significantly to the eventual collapse of the USSR.
+        `
       },
       { 
-        name: "Alexander the Great", 
-        year: "334 - 323 BCE", 
-        lat: 37.9, lng: 23.7, 
-        img: "./images/alexander.png", 
-        desc: "<b>World Conqueror</b><br>Alexander built an empire from Greece to India by age 30, spreading Greek culture (Hellenism) across three continents."
-      },
-      { 
-        name: "Adolf Hitler", 
-        year: "1933 - 1945", 
+        name: "Fall of Berlin Wall", 
+        year: "Nov 9, 1989", 
         lat: 52.5, lng: 13.4, 
-        img: "./images/hitler.png", 
-        desc: "<b>WWII and the Holocaust</b><br>Leader of Nazi Germany whose expansionist policies led to the deadliest conflict in human history and the genocide of six million Jews."
+        img: "./images/berlin.png", 
+        desc: `
+          <b>Chapter 2: The Fall of the Berlin Wall</b>
+          The most powerful symbol of the Cold War fell on Nov 9, 1989, signaling the end of the Iron Curtain.
+          <br><br>
+          <b>2.1 The Catalyst of Change</b>
+          Mikhail Gorbachev's 'Sinatra Doctrine' signaled that the USSR would no longer use force to prop up hardline communist regimes in Eastern Europe.
+          <br><br>
+          <b>2.2 The Night of Nov 9</b>
+          A bureaucratic mistake by East German official Günter Schabowski led to a premature announcement that travel restrictions were lifted. Thousands rushed the gates, and the guards, overwhelmed and without orders, opened the borders.
+        `
       },
       { 
-        name: "Gulf War", 
-        year: "1990 - 1991", 
-        lat: 29.3, lng: 47.9, 
-        img: "./images/gulfwar.png", 
-        desc: "<b>Operation Desert Storm</b><br>A US-led coalition liberated Kuwait following Iraq's invasion ordered by Saddam Hussein."
+        name: "Vietnam War", 
+        year: "1955 - 1975", 
+        lat: 14.0, lng: 108.0, 
+        img: "./images/vietnam.png", 
+        desc: `
+          <b>The Vietnam War: A Cold War Flashpoint</b>
+          A conflict between North Vietnam (supported by USSR/China) and South Vietnam (supported by the USA).
+          <br><br>
+          <b>Escalation</b>
+          What began as a colonial struggle against France escalated into a massive US military intervention to 'contain' communism. 
+          <br><br>
+          <b>3.3 The Fall of Saigon</b>
+          In April 1975, North Vietnamese tanks crashed through the gates of the Presidential Palace, reunifying the country and marking a significant shift in Asian geopolitics.
+        `
       },
       { 
-        name: "Collapse of USSR", 
-        year: "1991", 
-        lat: 55.7, lng: 37.6, 
-        img: "./images/ussr.png", 
-        desc: "<b>End of the Cold War</b><br>The dissolution of the Soviet Union marked the end of the bipolar world and the rise of 15 independent nations."
+        name: "Bangladesh War", 
+        year: "1971", 
+        lat: 23.8, lng: 90.4, 
+        img: "./images/bangladesh.png", 
+        desc: `
+          <b>The Bangladesh Liberation War</b>
+          A revolution and armed conflict sparked by the rise of Bengali nationalism in East Pakistan.
+          <br><br>
+          <b>Operation Searchlight</b>
+          In March 1971, the Pakistani military launched a crackdown, leading to massive human rights violations and millions of refugees fleeing to India.
+          <br><br>
+          <b>Indian Intervention</b>
+          India joined the war in Dec 1971, leading to the surrender of 93,000 Pakistani soldiers and the creation of the independent nation of Bangladesh.
+        `
       },
       { 
-        name: "9/11 Attacks", 
-        year: "2001", 
-        lat: 40.7, lng: -74.0, 
-        img: "./images/sept11.png", 
-        desc: "<b>The Day that Changed Everything</b><br>Terrorist attacks in NYC and Washington D.C. that triggered the global War on Terror."
+        name: "Civil Rights Movement", 
+        year: "1954 - 1968", 
+        lat: 38.9, lng: -77.0, 
+        img: "./images/civilrights.png", 
+        desc: `
+          <b>The Fight for Equality in the USA</b>
+          A decades-long struggle to abolish institutional racial segregation and discrimination.
+          <br><br>
+          <b>Key Legislation</b>
+          The Civil Rights Act of 1964 and the Voting Rights Act of 1965 dismantled 'Jim Crow' laws and enfranchised millions of Black Americans.
+          <br><br>
+          <b>Leadership</b>
+          Led by figures like Dr. Martin Luther King Jr., the movement used non-violent civil disobedience to reshape American society.
+        `
       },
       { 
-        name: "Arab Spring", 
-        year: "2010 - 2012", 
-        lat: 33.8, lng: 9.5, 
-        img: "./images/arabspring.png", 
-        desc: "<b>Middle East Revolutions</b><br>Pro-democracy uprisings that swept across Tunisia, Egypt, Libya, and Syria."
+        name: "Cuban Missile Crisis", 
+        year: "Oct 1962", 
+        lat: 23.1, lng: -82.3, 
+        img: "./images/cuba.png", 
+        desc: `
+          <b>13 Days on the Brink of Nuclear War</b>
+          The closest the world ever came to full-scale nuclear conflict.
+          <br><br>
+          <b>The Stand-off</b>
+          The US discovered Soviet nuclear missiles in Cuba. President Kennedy ordered a 'quarantine' around the island. 
+          <br><br>
+          <b>Resolution</b>
+          Khrushchev agreed to remove the missiles in exchange for a US pledge not to invade Cuba and a secret agreement to remove US missiles from Turkey.
+        `
       },
       { 
-        name: "Invasion of Ukraine", 
-        year: "2022 - Present", 
-        lat: 50.4, lng: 30.5, 
-        img: "./images/ukraine.png", 
-        desc: "<b>Modern Conflict in Europe</b><br>Russia's full-scale military invasion of Ukraine, escalating a conflict that began in 2014."
+        name: "Moon Landing", 
+        year: "July 20, 1969", 
+        lat: 28.5, lng: -80.6, 
+        img: "./images/moon.png", 
+        desc: `
+          <b>One Giant Leap for Mankind</b>
+          Apollo 11 became the first crewed mission to land on the Moon.
+          <br><br>
+          <b>The Race to Space</b>
+          The mission fulfilled President Kennedy's 1961 goal and marked a supreme technological achievement for humanity.
+          <br><br>
+          <b>Impact</b>
+          Neil Armstrong and Buzz Aldrin spent two hours on the lunar surface, collecting 47 lbs of lunar material.
+        `
+      },
+      { 
+        name: "Assassination of Ferdinand", 
+        year: "June 28, 1914", 
+        lat: 43.8, lng: 18.4, 
+        img: "./images/sarajevo.png", 
+        desc: `
+          <b>The Spark that Ignited World War I</b>
+          Archduke Franz Ferdinand of Austria was assassinated in Sarajevo by Gavrilo Princip.
+          <br><br>
+          <b>The Domino Effect</b>
+          This event triggered a series of alliances that brought the global powers into a catastrophic conflict that lasted four years.
+        `
       }
     ];
 
@@ -154,7 +233,7 @@
 
         function showDialogue(data) {
           document.getElementById('box-title').innerText = data.name;
-          document.getElementById('box-year').innerText = "Timeline: " + data.year;
+          document.getElementById('box-year').innerText = "TIMELINE: " + data.year;
           document.getElementById('box-desc').innerHTML = data.desc;
           
           document.getElementById('box-overlay').style.display = 'block';
@@ -173,7 +252,7 @@
         world.controls().autoRotate = true;
         world.controls().autoRotateSpeed = 0.5;
     } catch (err) {
-        document.body.innerHTML = "<h2 style='padding:20px'>Globe failed to load. Reason: " + err.message + "</h2>";
+        document.body.innerHTML = "<h2 style='padding:20px; color:black;'>Globe failed. Reason: " + err.message + "</h2>";
     }
   </script>
 </body>
